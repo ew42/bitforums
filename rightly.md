@@ -1,3 +1,0 @@
-# Rightly
-
-##First Principles
