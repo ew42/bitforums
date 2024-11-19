@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ew42/rightly.git"
+  },
+  "author": "ew42",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ew42/rightly/issues"
+  },
+  "homepage": "https://github.com/ew42/rightly#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
