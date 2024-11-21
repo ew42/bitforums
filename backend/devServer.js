@@ -1,5 +1,3 @@
-const express = require('express');
-const path = require('path');
 const app = require('./app.js');
 const http = require('http');
 

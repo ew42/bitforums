@@ -1,0 +1,15 @@
+#ew42logo {
+	width:200px;
+	length:75px;
+}
+
+nav {
+	display: flex;
+	justify-content: center;
+	margin: 0 auto;
+}
+
+#articlelogo {
+	width: 35px;
+	length: 46px;
+}
