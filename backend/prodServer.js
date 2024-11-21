@@ -16,7 +16,7 @@ const options = {
 const logStream = fs.createWriteStream(path.join(__dirname, 'log', 'server.log'), { flags: 'a'});
 
 function log(message) {
-	const timestamp = new Date.toISOString();
+	const timestamp = new Date().toISOString();
 	const logMessage = `${timestamp} - ${message}\n`;
 	console.log(logMessage);
 	logStream.write(logMessage);
