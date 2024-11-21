@@ -5,7 +5,8 @@ const index = require('./routes/index.js');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
+app.use(logger);
 app.use('/', index);
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 module.exports = app;
