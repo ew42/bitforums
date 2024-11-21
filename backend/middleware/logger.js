@@ -10,3 +10,5 @@ const logger = function (req, res, next) {
   logStream.write(message);
   next()
 }
+
+module.exports = logger;
