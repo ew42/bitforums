@@ -31,10 +31,12 @@ httpsServer.listen(httpsPort, () => {
 });
 
 http.createServer((req, res) => {
-	log(`HTTP to HTTPS redirect on port:${httpPort}`)
-}).listen(httpPort, () =>{
-		log(`Http to Https redirect server running on port:${httpPort}`);
-	});
+	log(`HTTP to HTTPS redirect on port:${httpPort}`);
+	res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+	res.end();
+}).listen(httpPort, () => {
+	log(`Http to Https redirect server running on port:${httpPort}`);
+});
 
 process.on('uncaughtException', (error) => {
   log(`Uncaught Exception: ${error.message}`);
