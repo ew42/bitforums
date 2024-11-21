@@ -7,7 +7,7 @@ const logger = require('./middleware/logger.js');
 const app = express();
 
 app.use(logger);
-app.use('/', index);
 app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.get('/', index);
 
 module.exports = app;
