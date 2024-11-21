@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const index = require('./routes/index.js');
+const logger = require('./middleware/logger.js');
 
 const app = express();
 
