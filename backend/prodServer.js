@@ -11,7 +11,7 @@ const keyPath = '/etc/letsencrypt/live/ew42.com/privkey.pem';
 const options = {
 	cert: fs.readFileSync(certPath),
 	key: fs.readFileSync(keyPath)
-}
+};
 
 const logStream = fs.createWriteStream(path.join(__dirname, 'log', 'server.log'), { flags: 'a'});
 
@@ -25,11 +25,13 @@ function log(message) {
 const httpsPort = 443;
 const httpPort = 80;
 
+//Create HTTPS server
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(httpsPort, () => {
 	log(`Https Server now running on ${httpsPort}`);
 });
 
+//HTTP to HTTPS server redirect
 http.createServer((req, res) => {
 	log(`HTTP to HTTPS redirect on port:${httpPort}`);
 	res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
