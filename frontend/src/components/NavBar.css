@@ -1,16 +1,11 @@
-
-#ew42logo {
-	width:200px;
-	length:75px;
+#home-logo {
+	width: 50px;
+	length: 25px;
 }
 
 nav {
 	display: flex;
-	justify-content: center;
+	justify-content: left;
 	margin: 0 auto;
-}
-
-#articlelogo {
-	width: 35px;
-	length: 46px;
+	border-bottom-style: solid;
 }

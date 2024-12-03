@@ -1,2 +1,11 @@
+html {
+	font-family: "Helvetica", "Verdana", "Arial";
+}
 
+strong {
+	color: #db5656;
+}
 
+em {
+	color: #5fadf5;
+}

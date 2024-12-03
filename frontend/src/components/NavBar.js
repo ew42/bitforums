@@ -1,11 +1,10 @@
-
 import React from 'react';
 import './NavBar.css';
 
 const NavBar = (props) => {
   return (
     <nav>
-      <a href="/" ><img src="ew42.png" id="ew42logo" /></a>
+      <a href="/" ><img src="home.png" id="home-logo" /></a>
     </nav>
 )};
 
