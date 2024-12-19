@@ -5,8 +5,8 @@ const fs = require('fs');
 const express = require('express');
 const app = require('./app.js');
 
-const certPath = '/etc/letsencrypt/live/ew42.com/fullchain.pem';
-const keyPath = '/etc/letsencrypt/live/ew42.com/privkey.pem';
+const certPath = '/etc/letsencrypt/live/bitforums.org/fullchain.pem';
+const keyPath = '/etc/letsencrypt/live/bitforums.org/privkey.pem';
 
 const options = {
 	cert: fs.readFileSync(certPath),
