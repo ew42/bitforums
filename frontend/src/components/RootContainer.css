@@ -1,0 +1,26 @@
+.pane-container {
+	display: flex;
+	width: 100%;
+	height: calc(100vh - 50px);
+	flex-direction: row;
+}
+
+.pane {
+	display: flex;
+	width: 100%;
+	padding: 20px;
+	flex-direction: row;
+	border: solid;
+}
+
+.button-div {
+	display: flex;
+	flex-direction: row;
+}
+
+.button-div > div {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+}
+
