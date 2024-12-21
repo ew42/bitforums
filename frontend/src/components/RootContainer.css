@@ -13,14 +13,21 @@
 	border: solid;
 }
 
-.button-div {
+.pane-control-panel {
 	display: flex;
 	flex-direction: row;
+	border: solid;
+	justify-content: space-between;
 }
 
-.button-div > div {
+.pane-control-panel > * {
 	display: flex;
 	flex-direction: row;
-	width: 100%;
+	border: solid;
 }
 
+.tab {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
