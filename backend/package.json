@@ -18,6 +18,9 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
-    "express": "^4.21.1"
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.1",
+    "mongoose": "^8.9.2"
+>>>>>>> 256393759a4248ff07ddf02501a920d82e2e21e8
   }
 }
