@@ -1,4 +1,4 @@
-import React, { useState}from 'react';
+import React, { useState }from 'react';
 import "./RootContainer.css";
 
 const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
@@ -9,7 +9,7 @@ const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
   </div>
 )};
 
-const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, openTab, selectTab }) => {
+const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, createNewTab, selectTab }) => {
 
   return (
     <div className="pane-control-panel">
@@ -17,20 +17,20 @@ const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, openTa
         {tabStates.left?.map((tab, arrayIndex) => <Tab key={
           `left-tab-${arrayIndex}`} pane="left" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
         )}
-        <button className="left-add" onClick={() => {openTab("left")}}>+</button>
+        <button className="left-add" onClick={() => {createNewTab("left")}}>+</button>
         <button className="left-toggle" onClick={() => {togglePanes("left")}}>Left Pane</button>
       </div>
       <div className="central-pane-div">
         {tabStates.central?.map((tab, arrayIndex) => <Tab key={
           `central-tab-${arrayIndex}`} pane="central" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
         )}
-        <button className="central-add" onClick={() => {openTab("central")}}>+</button>
+        <button className="central-add" onClick={() => {createNewTab("central")}}>+</button>
       </div>
         <div className="right-pane-div">
           {tabStates.right?.map((tab, arrayIndex) => <Tab key={
           `right-tab-${arrayIndex}`} pane="right" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
         )}
-          <button className="right-add" onClick={() => {openTab("right")}}>+</button>
+          <button className="right-add" onClick={() => {createNewTab("right")}}>+</button>
           <button className="right-toggle" onClick={() => {togglePanes("right")}}>Right Pane</button>
       </div>
     </div>
@@ -59,7 +59,7 @@ const RootContainer = () => {
     right: {currentTabIndex: 0, numOfTabs: 1, visible: true}
   });
 
-//pane here means name of pane -- I think
+//pane here means name of pane
   const togglePane = (pane) => {
     setPaneStates(prevPanes => ({
       ...prevPanes,
@@ -70,44 +70,7 @@ const RootContainer = () => {
     }))
   };
 
-  const closeTab = (pane, tabIndex) => {
-    setTabStates(prevTabs => ({
-      ...prevTabs,
-      [pane]: [
-        ...prevTabs[pane].slice(0, tabIndex),
-        ...prevTabs[pane].slice(tabIndex + 1)
-      ]
-    }));
-
-    setPaneStates(prevPanes => ({
-      ...prevPanes,
-      [pane]: {
-        ...prevPanes[pane],
-        numOfTabs: prevPanes[pane].numOfTabs - 1
-      }
-    })
-  )};
-
-  const openTab = (pane) => {
-    setTabStates(prevTabs => ({
-      ...prevTabs,
-      [pane]: [
-        ...prevTabs[pane],
-        {title: "Untitled", content: "You're a FN!"}
-        ]
-      }
-    ))
-      setPaneStates(prevPanes => ({
-        ...prevPanes,
-        [pane]: {
-          ...prevPanes[pane],
-          numOfTabs: prevPanes[pane].numOfTabs - 1
-        }
-    }))
-  };
-
   const selectTab = (pane, tabIndex) => {
-
 
     const currentTabIndex = panes[pane].currentTabIndex;
 
@@ -122,15 +85,135 @@ const RootContainer = () => {
       ...prevTabs,
       [pane]: prevTabs[pane].map((tab, index) => ({
           ...tab,
-          visible: index === currentTabIndex
+          visible: index === tabIndex 
         }))
       
     }));
   };
 
+  const closeTab = (pane, tabIndex) => {
+
+    const tabNumber = panes[pane].numOfTabs;
+    const lastTabIndex = tabNumber - 1;
+    const selectedTabIndex = panes[pane].currentTabIndex;
+
+    const isLastTab = tabNumber === 1;
+    const isSelectedTab = selectedTabIndex === tabIndex;
+    const newSelectedIndex = tabIndex === 0 ? 0 : tabIndex - 1;
+
+    setTabStates(prevTabs => {
+      if (isLastTab) {
+        return {
+          ...prevTabs,
+          [pane]: [{
+            title: "Untitled",
+            content: "Dafuq",
+            visible: true
+          }]
+        }
+      }
+
+      const updatedTabs = prevTabs[pane].filter((_, index) => index !== tabIndex);
+
+      if (isSelectedTab) {
+        return {
+          ...prevTabs,
+          [pane]: updatedTabs.map((tab, index) => ({
+              ...tab,
+              visible: index === newSelectedIndex
+          }))
+        }
+      }
+      else {
+        return {
+          ...prevTabs,
+          [pane]: updatedTabs.map((tab, index) => ({
+            ...tab,
+            visible: index === selectedTabIndex - (tabIndex < selectedTabIndex ? 1 : 0)
+          }))
+        }
+      }
+    });
+
+    setPaneStates(prevPanes => {
+      if (isLastTab) {
+        if (pane === "right" || pane === "left") {
+          return {
+            ...prevPanes,
+            [pane]: {
+              numOfTabs: 1,
+              currentTabIndex: 0,
+              visible: false
+            }
+          }
+        }
+        else { // central pane
+          return {
+            ...prevPanes,
+            pane: {
+              ...prevPanes[pane],
+              numOfTabs: 1,
+              currentTabIndex: 0
+            }
+          }
+        }
+      }
+      else if (isSelectedTab) {
+        return {
+          ...prevPanes,
+          [pane]: {
+            ...prevPanes[pane],
+            numOfTabs: tabNumber - 1,
+            currentTabIndex: newSelectedIndex
+          }
+        }
+      }
+      else {
+        return {
+          ...prevPanes,
+          [pane]: {
+            ...prevPanes[pane],
+            numOfTabs: tabNumber - 1,
+            currentTabIndex: selectedTabIndex - (tabIndex < selectedTabIndex ? 1 : 0)
+          }
+        }
+      }
+    });
+  };
+
+
+
+  const createNewTab = (pane) => {
+
+    const tabIndex = panes[pane].numOfTabs;
+
+    setTabStates(prevTabs => ({
+      ...prevTabs,
+      [pane]: [
+        ...prevTabs[pane].map((tab) => ({
+        ...tab,
+        visible: false
+        })),
+        {title: "Untitled", content: "You're Next", visible: true}
+      ]
+
+    }));
+
+    setPaneStates(prevPanes => ({
+      ...prevPanes,
+      [pane]: {
+        ...prevPanes[pane],
+        numOfTabs: prevPanes[pane].numOfTabs + 1,
+        currentTabIndex: tabIndex
+      }
+    }));
+
+  };
+
+
   return (
   <div className="RootContainer">
-    <PaneControlPanel paneStates={panes} togglePanes={togglePane} tabStates={tabs} closeTab={closeTab} openTab={openTab} selectTab={selectTab}/>
+    <PaneControlPanel paneStates={panes} togglePanes={togglePane} tabStates={tabs} closeTab={closeTab} createNewTab={createNewTab} selectTab={selectTab}/>
     <div className="pane-container">
         {panes["left"].visible && (
         <Pane title={tabs.left[panes.left.currentTabIndex].title}/>)}
