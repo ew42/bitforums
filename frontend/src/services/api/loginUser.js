@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:80/api';
 
-const loginUser = async (username, password) => {
+export const loginUser = async (username, password) => {
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
@@ -21,5 +21,3 @@ const loginUser = async (username, password) => {
     throw error;
   }
 };
-
-export default loginUser;

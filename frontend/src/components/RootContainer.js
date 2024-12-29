@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../services/api/registerUser';
-import '../services/api/loginUser';
 import "./RootContainer.css";
+import {loginUser} from "../services/api/loginUser";
 
 const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
   return (
@@ -114,7 +114,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      await loginUser({ username, password });
+      await loginUser(username, password);
       setErrorMessage('');
       setIsLoggedIn(true);
     }
