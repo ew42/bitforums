@@ -3,45 +3,64 @@ const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   username: {
-    type: String;
-    required: true;
-    unique: true;
-    trim: true;
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
   },
   email: {
-    type: String;
-    required: true;
-    unique: true;
-    trim: true;
-    lowercase: true;
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
   },
   password: {
-    type: String;
-    required: true;
+    type: String,
+    required: true
   },
   createdAt: {
-    type: Date;
-    default: Date.now;
+    type: Date,
+    default: Date.now
   },
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post'
-  }]
+  }],
+  tokenVersion: {
+    type: Number,
+    default: 0
+  },
+  passwordLastChanged: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 userSchema.pre('save', async function(next) {
-  if (this.isNew || this.isModified('password') {
+  if (this.isNew || this.isModified('password')) {
     try {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
+      this.passwordLastChanged = new Date();
+      this.tokenVersion = (this.tokenVersion || 0) + 1;
     }
     catch (error) {
       return next(error)
     }
-  })
+  }
   next();
 });
 
+userSchema.methods.comparePassowrd = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  }
+  catch (error) {
+    throw error;
+  }
+};
+
 const User = mongoose.model('User', userSchema);
 
-export default User;
+module.exports = User;

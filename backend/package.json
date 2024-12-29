@@ -17,10 +17,11 @@
   "homepage": "https://github.com/ew42/rightly#readme",
   "description": "",
   "dependencies": {
-    "dotenv": "^16.4.7",
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2"
->>>>>>> 256393759a4248ff07ddf02501a920d82e2e21e8
   }
 }

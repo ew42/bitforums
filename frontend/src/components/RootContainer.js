@@ -1,4 +1,6 @@
-import React, { useState }from 'react';
+import React, { useState } from 'react';
+import { registerUser } from '../services/api/registerUser';
+import '../services/api/loginUser';
 import "./RootContainer.css";
 
 const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
@@ -36,190 +38,123 @@ const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, create
     </div>
 )};
 
-const Pane = ({ title="test" }) => {
+const Pane = ({ title="test", type="viewer", content="test" }) => {
+  const renderContent = () => {
+    switch (type) {
+      case "viewer":
+        return <Viewer title={title} content={content} />;
+      // case "editor":
+      //   return <Editor title={title} />;
+      case "register":
+        return <Register />;
+      case "login":
+        return <Login />;
+    }
+  };
+
   return (
   <div className="pane">
-    <h1>{title}</h1>
+    {renderContent()}
   </div>
 )};
 
-const RootContainer = () => {
+const Viewer = ({ title="test", content="test" }) => {
+  return (
+  <div className="viewer">
+    <h1>{title}</h1>
+    <p>{content}</p>
+  </div>
+)};
 
-  //tab stuff
-  const [tabs, setTabStates] = useState({
-    left: [{title: "top posts", content: "blah blah blah", visible: true}],
-    central: [{title: "viewer", content: "you're a bum", visible: true}, {title: "editor", content: "balls", visible: false}],
-    right: [{title: "top forums", content: "sineP", visible: true}]
-  });
+const Register = () => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  //pane stuff
-  const [panes, setPaneStates] = useState({
-    left: {currentTabIndex: 0, numOfTabs: 1, visible: true},
-    central: {currentTabIndex: 0, numOfTabs: 2, visible: true},
-    right: {currentTabIndex: 0, numOfTabs: 1, visible: true}
-  });
-
-//pane here means name of pane
-  const togglePane = (pane) => {
-    setPaneStates(prevPanes => ({
-      ...prevPanes,
-      [pane]: {
-        ...prevPanes[pane],
-        visible: !prevPanes[pane].visible
-      }
-    }))
+  const handleRegister = async () => {
+    try {
+      await registerUser({ email, username, password });
+      setErrorMessage('');
+      setIsRegistered(true);
+    }
+    catch (error) {
+      console.error('Registration failed', error);
+      setErrorMessage(error.message);
+    }
   };
 
-  const selectTab = (pane, tabIndex) => {
+  return (
+    <div className="register">
+      {!isRegistered ? (
+        <div className="register-form">
+        <h1>Register</h1>
+        <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {errorMessage && <p className="registration-error-message">{errorMessage}</p>}
+        <button onClick={handleRegister}>Register</button>
+        </div>
+      ) : (
+        <div className="registered-div">
+          <h1>Registration Successful</h1>
+          <p>Welcome, {username}!</p>
+        </div>
+      )}
+    </div>
+  );
+};
 
-    const currentTabIndex = panes[pane].currentTabIndex;
+const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    setPaneStates(prevPanes => ({
-        ...prevPanes,
-        [pane]: {
-          ...prevPanes[pane],
-          currentTabIndex: tabIndex
-        }
-    }));
-    setTabStates(prevTabs => ({
-      ...prevTabs,
-      [pane]: prevTabs[pane].map((tab, index) => ({
-          ...tab,
-          visible: index === tabIndex 
-        }))
-      
-    }));
+  const handleLogin = async () => {
+    try {
+      await loginUser({ username, password });
+      setErrorMessage('');
+      setIsLoggedIn(true);
+    }
+    catch (error) {
+      console.error('Login failed', error);
+      setErrorMessage(error.message);
+    }
   };
 
-  const closeTab = (pane, tabIndex) => {
+  return (
+    <div className="login-page">
+    {!isLoggedIn ? (
+      <div className="login-page">
+        <h1>Login</h1>
+        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {errorMessage && <p className="login-error-message">{errorMessage}</p>}
+        <button onClick={handleLogin}>Login</button>
+      </div>
+    ) : (
+      <div className="logged-in-div">
+        <h1>Login Successful</h1>
+        <p>Welcome, {username}!</p>
+      </div>
+    )}
+    </div>
+  );
+};
 
-    const tabNumber = panes[pane].numOfTabs;
-    const lastTabIndex = tabNumber - 1;
-    const selectedTabIndex = panes[pane].currentTabIndex;
-
-    const isLastTab = tabNumber === 1;
-    const isSelectedTab = selectedTabIndex === tabIndex;
-    const newSelectedIndex = tabIndex === 0 ? 0 : tabIndex - 1;
-
-    setTabStates(prevTabs => {
-      if (isLastTab) {
-        return {
-          ...prevTabs,
-          [pane]: [{
-            title: "Untitled",
-            content: "Dafuq",
-            visible: true
-          }]
-        }
-      }
-
-      const updatedTabs = prevTabs[pane].filter((_, index) => index !== tabIndex);
-
-      if (isSelectedTab) {
-        return {
-          ...prevTabs,
-          [pane]: updatedTabs.map((tab, index) => ({
-              ...tab,
-              visible: index === newSelectedIndex
-          }))
-        }
-      }
-      else {
-        return {
-          ...prevTabs,
-          [pane]: updatedTabs.map((tab, index) => ({
-            ...tab,
-            visible: index === selectedTabIndex - (tabIndex < selectedTabIndex ? 1 : 0)
-          }))
-        }
-      }
-    });
-
-    setPaneStates(prevPanes => {
-      if (isLastTab) {
-        if (pane === "right" || pane === "left") {
-          return {
-            ...prevPanes,
-            [pane]: {
-              numOfTabs: 1,
-              currentTabIndex: 0,
-              visible: false
-            }
-          }
-        }
-        else { // central pane
-          return {
-            ...prevPanes,
-            pane: {
-              ...prevPanes[pane],
-              numOfTabs: 1,
-              currentTabIndex: 0
-            }
-          }
-        }
-      }
-      else if (isSelectedTab) {
-        return {
-          ...prevPanes,
-          [pane]: {
-            ...prevPanes[pane],
-            numOfTabs: tabNumber - 1,
-            currentTabIndex: newSelectedIndex
-          }
-        }
-      }
-      else {
-        return {
-          ...prevPanes,
-          [pane]: {
-            ...prevPanes[pane],
-            numOfTabs: tabNumber - 1,
-            currentTabIndex: selectedTabIndex - (tabIndex < selectedTabIndex ? 1 : 0)
-          }
-        }
-      }
-    });
-  };
-
-
-
-  const createNewTab = (pane) => {
-
-    const tabIndex = panes[pane].numOfTabs;
-
-    setTabStates(prevTabs => ({
-      ...prevTabs,
-      [pane]: [
-        ...prevTabs[pane].map((tab) => ({
-        ...tab,
-        visible: false
-        })),
-        {title: "Untitled", content: "You're Next", visible: true}
-      ]
-
-    }));
-
-    setPaneStates(prevPanes => ({
-      ...prevPanes,
-      [pane]: {
-        ...prevPanes[pane],
-        numOfTabs: prevPanes[pane].numOfTabs + 1,
-        currentTabIndex: tabIndex
-      }
-    }));
-
-  };
-
+const RootContainer = ({tabs, panes, togglePane, closeTab, createNewTab, selectTab}) => {
 
   return (
   <div className="RootContainer">
     <PaneControlPanel paneStates={panes} togglePanes={togglePane} tabStates={tabs} closeTab={closeTab} createNewTab={createNewTab} selectTab={selectTab}/>
     <div className="pane-container">
         {panes["left"].visible && (
-        <Pane title={tabs.left[panes.left.currentTabIndex].title}/>)}
-        <Pane title={tabs.central[panes.central.currentTabIndex].title}/>
+        <Pane title={tabs.left[panes.left.currentTabIndex].title} type={tabs.left[panes.left.currentTabIndex].type} content={tabs.left[panes.left.currentTabIndex].content}/>)}
+        <Pane title={tabs.central[panes.central.currentTabIndex].title} type={tabs.central[panes.central.currentTabIndex].type} content={tabs.central[panes.central.currentTabIndex].content}/>
         {panes["right"].visible && (
-        <Pane title={tabs.right[panes.right.currentTabIndex].title}/>)}
+        <Pane title={tabs.right[panes.right.currentTabIndex].title} type={tabs.right[panes.right.currentTabIndex].type} content={tabs.right[panes.right.currentTabIndex].content}/>)}
     </div>
   </div>
 )};
