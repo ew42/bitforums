@@ -1,5 +1,5 @@
 import { fetchPosts } from '../services/api/fetchPosts';
-// import { fetchForums } from '../services/api/fetchForums.js';
+import { fetchForums } from '../services/api/fetchForums.js';
 import { useState, useEffect } from 'react';
 
 const useTabData = () => {
@@ -26,21 +26,23 @@ const useTabData = () => {
       setIsLoading(true);
       try {
         // const [postsData, forumsData] = await Promise.all([
-        const postsData = await fetchPosts('676d756485b3b71e45ce138b');
-          // fetchForums()
+        const postData = await fetchPosts('67744aeab028014cfe718327');
+        const forumData = await fetchForums('67744aeab028014cfe71831b');
         // ]);
         setTabStates(prevTabs => ({
           ...prevTabs,
           left: [{
-            title: "top posts",
-            content: postsData.content,
+            title: postData.title,
+            content: postData.content,
+            visible: true
+          }],
+          right: [{
+            title: forumData.name,
+            type: "forum",
+            content: forumData.content,
+            forumId: forumData._id,
             visible: true
           }]
-          // right: [{
-          //   // title: "top forums",
-          //   // content: forumsData,
-          //   // visible: true
-          // }]
         }));
       }
       catch (error) {

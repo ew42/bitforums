@@ -23,10 +23,19 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  moderating: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Forum'
+  }],
+  participating: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Forum'
+  }],
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post'
   }],
+
   tokenVersion: {
     type: Number,
     default: 0

@@ -8,7 +8,7 @@ const postAPI = require('./routes/api/postAPI.js');
 const loginUserAPI = require('./routes/api/loginUserAPI.js');
 const registerUserAPI = require('./routes/api/registerUserAPI');
 const auth = require('./middleware/auth.js');
-//const webhook = require('./routes/webhook.js');
+const forumAPI = require('./routes/api/forumAPI.js');
 
 const app = express();
 
@@ -20,11 +20,10 @@ app.use(cors({
 app.use(express.json());
 
 //public routes
-app.use('/api', registerUserAPI);
-app.use('/api', loginUserAPI);
-
-// Protected routes (auth required)
-app.use('/api/post', auth, postAPI);
+app.use('/api/register', registerUserAPI);
+app.use('/api/login', loginUserAPI);
+app.use('/api/post', postAPI);
+app.use('/api/forum', forumAPI);
 
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.get('/', index);

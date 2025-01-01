@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { registerUser } from '../services/api/registerUser';
+import { loginUser } from "../services/api/loginUser";
+import { fetchForums } from "../services/api/fetchForums"
+import { fetchPosts } from "../services/api/fetchPosts"
 import "./RootContainer.css";
-import {loginUser} from "../services/api/loginUser";
 
 const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
   return (
@@ -38,13 +40,15 @@ const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, create
     </div>
 )};
 
-const Pane = ({ title="test", type="viewer", content="test" }) => {
+const Pane = ({ title="test", type="viewer", content="test", forumId }) => {
   const renderContent = () => {
     switch (type) {
       case "viewer":
         return <Viewer title={title} content={content} />;
       // case "editor":
       //   return <Editor title={title} />;
+      case "forum":
+        return <Forum title={title} forumId={forumId} />;
       case "register":
         return <Register />;
       case "login":
@@ -65,6 +69,75 @@ const Viewer = ({ title="test", content="test" }) => {
     <p>{content}</p>
   </div>
 )};
+
+const Forum = ({ title="Forum", forumId }) => {
+  const [forumData, setForumData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+
+    let isMounted = true;
+
+    async function loadForumData() {
+      console.log(forumId);
+      if (!forumId) {
+        setError("No forum ID provided");
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const data = await fetchForums(forumId);
+        console.log("data populated");
+        setForumData(data);
+        setError(null);
+      }
+      catch (err) {
+        setError(err.message);
+      }
+      finally {
+        setIsLoading(false);
+      }
+    }
+    loadForumData(forumId);
+    return () => {
+      isMounted = false;
+    };
+  }, [forumId]);
+
+  if (isLoading) {
+    return (
+      <div>Loading...</div>
+    );
+  }
+  if (error) {
+    return (
+      <div>Error: {error}</div>
+    );
+  }
+  if (!forumData) {
+    return (
+      <div>No forum data available</div>
+    );
+  }
+
+  return (
+    <div className="forum-data">
+      <h1>{forumData.name}</h1>
+      <p>{forumData.description}</p>
+      <h2>Conversations:</h2>
+      <ul>
+      {forumData.conversations.map(conversation => (
+        <li key={conversation._id}>
+          <h3>{conversation.title}</h3>
+          <p>{conversation.description}</p>
+        </li>
+      ))}
+      </ul>
+    </div>
+  );
+};
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -151,10 +224,25 @@ const RootContainer = ({tabs, panes, togglePane, closeTab, createNewTab, selectT
     <PaneControlPanel paneStates={panes} togglePanes={togglePane} tabStates={tabs} closeTab={closeTab} createNewTab={createNewTab} selectTab={selectTab}/>
     <div className="pane-container">
         {panes["left"].visible && (
-        <Pane title={tabs.left[panes.left.currentTabIndex].title} type={tabs.left[panes.left.currentTabIndex].type} content={tabs.left[panes.left.currentTabIndex].content}/>)}
-        <Pane title={tabs.central[panes.central.currentTabIndex].title} type={tabs.central[panes.central.currentTabIndex].type} content={tabs.central[panes.central.currentTabIndex].content}/>
+        <Pane 
+          title={tabs.left[panes.left.currentTabIndex].title}
+          type={tabs.left[panes.left.currentTabIndex].type}
+          content={tabs.left[panes.left.currentTabIndex].content}
+          forumId={tabs.left[panes.left.currentTabIndex.forumId]}
+          />)}
+        <Pane 
+        title={tabs.central[panes.central.currentTabIndex].title}
+        type={tabs.central[panes.central.currentTabIndex].type}
+        content={tabs.central[panes.central.currentTabIndex].content}
+        forumId={tabs.central[panes.left.currentTabIndex.forumId]}
+        />
         {panes["right"].visible && (
-        <Pane title={tabs.right[panes.right.currentTabIndex].title} type={tabs.right[panes.right.currentTabIndex].type} content={tabs.right[panes.right.currentTabIndex].content}/>)}
+        <Pane 
+        title={tabs.right[panes.right.currentTabIndex].title}
+        type={tabs.right[panes.right.currentTabIndex].type}
+        content={tabs.right[panes.right.currentTabIndex].content}
+        forumId={tabs.right[panes.right.currentTabIndex.forumId]}
+        />)}
     </div>
   </div>
 )};

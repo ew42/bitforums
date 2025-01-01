@@ -3,6 +3,11 @@ const http = require('http');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+require('./controllers/User');
+require('./controllers/Forum');
+require('./controllers/Conversation');
+require('./controllers/Post');
+
 const port = 80;
 const mongoURI = process.env.MONGO_URI;
 console.log(mongoURI);
