@@ -2,7 +2,7 @@ const API_BASE_URL = 'http://localhost:80/api';
 
 export const registerUser = async (userInfo) => {
   console.log("Registering User");
-  const url = `${API_BASE_URL}/registerUserAPI`;
+  const url = `${API_BASE_URL}/register`;
 
   try {
     const response = await fetch(url, {

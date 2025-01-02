@@ -9,12 +9,14 @@ const loginUserAPI = require('./routes/api/loginUserAPI.js');
 const registerUserAPI = require('./routes/api/registerUserAPI');
 const auth = require('./middleware/auth.js');
 const forumAPI = require('./routes/api/forumAPI.js');
+const conversationAPI = require('./routes/api/conversationAPI.js');
+const validateTokenAPI = require('./routes/api/validateTokenAPI.js');
 
 const app = express();
 
 app.use(logger);
 app.use(cors({
-  origin: ['http://localhost:80', 'http://localhost:3000'],
+  origin: ['http://localhost:80'],
   credentials: true
 }));
 app.use(express.json());
@@ -24,6 +26,8 @@ app.use('/api/register', registerUserAPI);
 app.use('/api/login', loginUserAPI);
 app.use('/api/post', postAPI);
 app.use('/api/forum', forumAPI);
+app.use('/api/conversation', conversationAPI);
+app.use('api/validate', validateTokenAPI);
 
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.get('/', index);
