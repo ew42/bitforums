@@ -1,9 +1,9 @@
-const API_BASE_URL = 'http://localhost:80/api';
+import config from '../../config';
 
 // Fetch single forum by ID
 export const fetchForum = async (forumId) => {
   console.log(`Fetching forum with id: ${forumId}`);
-  const url = `${API_BASE_URL}/forum/${forumId}`;
+  const url = `${config.API_URL}/forum/${forumId}`;
 
   try {
     const response = await fetch(url);

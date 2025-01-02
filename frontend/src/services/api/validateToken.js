@@ -1,11 +1,11 @@
-const API_BASE_URL = 'http://localhost:80/api';
+import config from '../../config';
 
 export const validateToken = async () => {
   const token = localStorage.getItem('authToken');
   if (!token) return false;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/validate`, {
+    const response = await fetch(`${config.API_URL}/validate`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

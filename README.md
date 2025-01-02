@@ -1,6 +1,6 @@
 # Rightly
 
-## First Principles
+## Founding Principles
 
 The internet enables instantaneous and geography-blind communication
     - Anyone regardless of location, can engage in conversations with anyone else
@@ -24,7 +24,7 @@ These platforms are not designed to optimize for these kinds of discussions.
 
 Bad signal to noise:
     Organize posts into conversations.
-    Conversations are invite-only discussion forums that anyone can create.
+    Forums are invite-only discussion forums that anyone can create.
     The point is for these to be high-quality written discussions are made up of individual posts.
     Posts can be standalone or replies to others. I'm thinking that a graph structure might be useful here.
     Incorporate some sort of upvote/downvote system. Posts with higher scores should have larger nodes in the graph model.

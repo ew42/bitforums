@@ -1,8 +1,8 @@
-const API_BASE_URL = 'http://localhost:80/api';
+import config from '../../config';
 
 export const fetchConversationPosts = async (conversationId) => {
   console.log(`Fetching posts for conversation: ${conversationId}`);
-  const url = `${API_BASE_URL}/conversation/${conversationId}/posts`;
+  const url = `${config.API_URL}/conversation/${conversationId}/posts`;
 
   try {
     const response = await fetch(url);

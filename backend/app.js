@@ -16,7 +16,7 @@ const app = express();
 
 app.use(logger);
 app.use(cors({
-  origin: ['http://localhost:80'],
+  origin: ['http://localhost:80','http://localhost:3000'],
   credentials: true
 }));
 app.use(express.json());
@@ -27,7 +27,7 @@ app.use('/api/login', loginUserAPI);
 app.use('/api/post', postAPI);
 app.use('/api/forum', forumAPI);
 app.use('/api/conversation', conversationAPI);
-app.use('api/validate', validateTokenAPI);
+app.use('/api/validate', validateTokenAPI);
 
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.get('/', index);

@@ -1,8 +1,8 @@
-const API_BASE_URL = 'http://localhost:80/api';
+import config from '../../config';
 
 export const fetchPosts = async (postId) => {
   console.log('Fetching post with id:', postId);
-  const url = `${API_BASE_URL}/post/${postId}`;
+  const url = `${config.API_URL}/post/${postId}`;
   console.log('URL:', url);
   try {
     const response = await fetch(url);

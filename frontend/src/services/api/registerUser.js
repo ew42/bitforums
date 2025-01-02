@@ -1,8 +1,9 @@
-const API_BASE_URL = 'http://localhost:80/api';
+import config from '../../config';
+
 
 export const registerUser = async (userInfo) => {
   console.log("Registering User");
-  const url = `${API_BASE_URL}/register`;
+  const url = `${config.API_URL}/register`;
 
   try {
     const response = await fetch(url, {
