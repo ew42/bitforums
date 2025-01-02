@@ -16,7 +16,7 @@ const app = express();
 
 app.use(logger);
 app.use(cors({
-  origin: ['http://localhost:80','http://localhost:3000'],
+  origin: ['http://localhost:80', 'http://localhost:3000', 'https://bitforums.org'],
   credentials: true
 }));
 app.use(express.json());
@@ -29,7 +29,13 @@ app.use('/api/forum', forumAPI);
 app.use('/api/conversation', conversationAPI);
 app.use('/api/validate', validateTokenAPI);
 
+// Then static files and catch-all route
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Static files and catch-all route for client-side routing
 app.use(express.static(path.join(__dirname, '../frontend/build')));
-app.get('/', index);
+app.get('*', index);
 
 module.exports = app;
