@@ -29,7 +29,7 @@ export const fetchForums = async (options = {}) => {
   if (filter) queryParams.append('filter', filter);
   if (search) queryParams.append('search', search);
   
-  const url = `${API_BASE_URL}/forum?${queryParams.toString()}`;
+  const url = `${config.API_URL}/forum?${queryParams.toString()}`;
 
   try {
     const response = await fetch(url);
