@@ -4,7 +4,6 @@ import config from '../../config';
 export const fetchForum = async (forumId) => {
   console.log(`Fetching forum with id: ${forumId}`);
   const url = `${config.API_URL}/forum/${forumId}`;
-  console.log("Fetching forum from", url);
 
   try {
     const response = await fetch(url);

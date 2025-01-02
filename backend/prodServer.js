@@ -1,6 +1,7 @@
 const https = require('https');
 const http = require('http');
 const path = require('path');
+const mongoose = require('mongoose');
 const fs = require('fs');
 const express = require('express');
 const app = require('./app.js');
@@ -24,6 +25,24 @@ function log(message) {
 
 const httpsPort = 443;
 const httpPort = 80;
+
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI)
+  .then(() => {
+    console.log('Connected to MongoDB'); 
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
+
+mongoose.connection.on('error', (error) => {
+  console.error('MongoDB connection error:', error);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.error('MongoDB disconnected');
+});
 
 //Create HTTPS server
 const httpsServer = https.createServer(options, app);
