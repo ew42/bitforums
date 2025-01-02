@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const express = require('express');
 const app = require('./app.js');
+require('dotenv').config();
 
 const certPath = '/etc/letsencrypt/live/bitforums.org/fullchain.pem';
 const keyPath = '/etc/letsencrypt/live/bitforums.org/privkey.pem';
