@@ -9,7 +9,7 @@ require('./controllers/Conversation');
 require('./controllers/Post');
 
 const port = 80;
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGODB_URI;
 console.log(mongoURI);
 
 mongoose.connect(mongoURI)

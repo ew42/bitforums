@@ -27,7 +27,7 @@ function log(message) {
 const httpsPort = 443;
 const httpPort = 80;
 
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose.connect(mongoURI)
   .then(() => {
