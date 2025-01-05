@@ -21,6 +21,7 @@ export const registerUser = async (userInfo) => {
       }
       throw new Error(data.error || 'Registration failed');
     }
+    localStorage.setItem('authToken', data.token);
     return data;
   }
   catch (error) {

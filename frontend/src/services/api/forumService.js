@@ -44,3 +44,36 @@ export const fetchForums = async (options = {}) => {
     throw error;
   }
 };
+
+export const createNewForum = async (forumData) => {
+  console.log('Creating new forum with data:', JSON.stringify(forumData));
+  const url = `${config.API_URL}/forum`;
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error('Please login to create a forum');
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(forumData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error: status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.error('Error creating forum:', error);
+    throw error;
+  }
+};

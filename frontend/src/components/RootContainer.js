@@ -1,14 +1,111 @@
 import React, { useState, useEffect } from 'react';
 import { registerUser } from '../services/api/registerUser';
 import { loginUser } from "../services/api/loginUser";
-import { fetchForum, fetchForums } from "../services/api/fetchForums"
-import { fetchPosts } from "../services/api/fetchPosts"
+import { fetchForum, fetchForums, createNewForum } from "../services/api/forumService"
+import { fetchPosts } from "../services/api/fetchPosts";
+import { savePost } from "../services/api/savePost";
 import "./RootContainer.css";
 import "./GraphView";
-import { fetchConversationPosts } from '../services/api/fetchConversationPosts';
+import { fetchConversationPosts, createNewConversation } from '../services/api/conversationServices';
 import GraphView from './GraphView';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import Markdown from 'react-markdown';
+import "./MarkdownEditor.css";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
+import Heading from '@tiptap/extension-heading';
+import Bold from '@tiptap/extension-bold';
+import Italic from '@tiptap/extension-italic';
+import Blockquote from '@tiptap/extension-blockquote';
+
+import TurndownService from 'turndown';
 
 const API_BASE_URL = 'http://localhost:80/api';
+
+const ConversationSettings = ({ forumData, createNewTab }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSave = async () => {
+    // Input validation
+    if (!title.trim() || !description.trim()) {
+      setError('Title and description are required');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await createNewConversation({
+        title,
+        description,
+        forumId: forumData._id
+      });
+
+      setIsSuccess(true);
+      
+      // Open the graph view for the new conversation
+      createNewTab(
+        "right",
+        title,
+        "graph view",
+        response._id,
+        { conversationId: response._id }
+      );
+    }
+    catch (error) {
+      setError(error.message || 'Failed to create conversation. Please try again.');
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <div className='conversation-settings success'>
+        <h2>Conversation Created Successfully!</h2>
+        <p>Your new conversation "{title}" has been created.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className='conversation-settings'>
+      <h1>Create new conversation in {forumData.name}</h1>
+      {error && <div className="error-message">{error}</div>}
+      <input 
+        type='text' 
+        value={title} 
+        placeholder='Title' 
+        onChange={(e) => setTitle(e.target.value)}
+        disabled={isLoading}
+      />
+      <input 
+        type='text' 
+        value={description} 
+        placeholder='Description' 
+        onChange={(e) => setDescription(e.target.value)}
+        disabled={isLoading}
+      />
+      <button 
+        onClick={handleSave}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Creating...' : 'Create Conversation'}
+      </button>
+    </div>
+  );
+};
 
 const ForumCard = ({pane, name, description, forumId, createNewTab}) => {
   const handleClick = () => {
@@ -63,7 +160,7 @@ const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, create
     </div>
 )};
 
-const Pane = ({ title="test", type="viewer", id, pane, createNewTab }) => {
+const Pane = ({ title="test", type="viewer", id, pane, createNewTab, metadata }) => {
   const renderContent = () => {
     switch (type) {
       case "viewer":
@@ -89,7 +186,31 @@ const Pane = ({ title="test", type="viewer", id, pane, createNewTab }) => {
               post._id
             )
           }}
+          onCreatePost={(parentPostIds, conversationId) => {
+            createNewTab(
+              "central",
+              "New Post",
+              "editor",
+              "",
+              { 
+                conversationId: conversationId,
+                parentPosts: parentPostIds 
+              }
+            )
+          }}
         />
+      case "editor":
+        return <MarkdownEditor 
+          onSave={() => {console.log("Saving content")}}
+          metadata={metadata}
+        />;
+      case "conversation settings":
+        return <ConversationSettings 
+        forumData={metadata}
+        createNewTab={createNewTab}
+        />
+      case "forum settings":
+        return <ForumSettings createNewTab={createNewTab} />;
     }
   };
 
@@ -140,22 +261,27 @@ const Viewer = ({ title="test", postId}) => {
     };
   }, [postId]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!postData) {
-    return <div>No post data available</div>;
-  }
-
   return (
     <div className="viewer">
-      <h1>{postData.title}</h1>
-      <p>{postData.content}</p>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : postData ? (
+        <div>
+          <h2>{postData.title}</h2>
+          <h3>{postData.author.username}</h3>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            className="markdown-content"
+          >
+            {postData.content}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        <p>No post data available</p>
+      )}
     </div>
   );
 };
@@ -164,6 +290,16 @@ const Forum = ({ title="Forum", forumId, createNewTab}) => {
   const [forumData, setForumData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleNewConversation = () => {
+    createNewTab(
+      'central',
+      'Conversation Settings',
+      'conversation settings',
+      '',
+      forumData
+    )
+  };
 
   useEffect(() => {
 
@@ -217,6 +353,7 @@ const Forum = ({ title="Forum", forumId, createNewTab}) => {
       <h1>{forumData.name}</h1>
       <p>{forumData.description}</p>
       <h2>Conversations:</h2>
+      <button onClick={handleNewConversation}>+</button>
       <div className="conversation-list">
         {forumData.conversations.map(conversation => (
           <ConversationCard
@@ -332,6 +469,14 @@ const ForumBrowser = ({ pane, createNewTab}) => {
     populateForums();
   }, [filter, searchQuery]);
 
+  const handleNewForum = () => {
+    createNewTab(
+      'central',
+      'Forum Settings',
+      'forum settings'
+    );
+  };
+
   return (
     <div className="forum-browser">
       <div className="forum-controls">
@@ -346,6 +491,7 @@ const ForumBrowser = ({ pane, createNewTab}) => {
           <option value="recent">Recently Created</option>
           <option value="active">Most Active</option>
         </select>
+        <button onClick={handleNewForum}>Create New Forum</button>
       </div>
       
       <div className="forum-list">
@@ -370,7 +516,8 @@ const ConversationCard = ({pane, title, description, conversationId, createNewTa
       "right",  // Always create in right pane
       title,
       "graph view",
-      conversationId
+      conversationId,
+      { conversationId: conversationId }  // Pass metadata with conversation ID
     );
   };
 
@@ -378,6 +525,160 @@ const ConversationCard = ({pane, title, description, conversationId, createNewTa
     <div className="conversation-card" onClick={handleClick}>
       <h3>{title}</h3>
       <p>{description}</p>
+    </div>
+  );
+};
+
+const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = false }) => {
+  const [title, setTitle] = useState('');
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Document,
+      Paragraph,
+      Text,
+      Heading.configure({
+        levels: [1, 2, 3, 4, 5, 6]
+      }),
+      Bold,
+      Italic,
+      Blockquote
+    ],
+    content: initialValue,
+    editable: !readOnly
+  });
+
+  const handleSave = async () => {
+    if (editor) {
+      const turndownService = new TurndownService();
+      const htmlContent = editor.getHTML();
+      const markdownContent = turndownService.turndown(htmlContent);
+      
+      try {
+        const postData = {
+          title: title,
+          content: markdownContent,
+          conversation: metadata.conversationId,
+          parentPosts: metadata.parentPosts || []
+        };
+        console.log("Saving post with data:", postData);
+        await savePost(postData);
+        console.log("Post saved successfully");
+      } catch (error) {
+        console.error("Failed to save post:", error);
+      }
+    }
+  };
+
+  if (readOnly) {
+    return (
+      <div className="markdown-display">
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+        >
+          {initialValue}
+        </ReactMarkdown>
+      </div>
+    );
+  }
+
+  return (
+    <div className="markdown-editor">
+
+      <div className="editor-toolbar">
+        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>H1</button>
+        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>H2</button>
+        <button onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
+        <button onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>
+        <button onClick={() => editor.chain().focus().toggleBlockquote().run()}>Quote</button>
+        <button onClick={handleSave}>Save</button>
+      </div>
+      <input
+        type="text"
+        placeholder="Enter post title..."
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="title-input"
+      />
+      <EditorContent editor={editor} />
+    </div>
+  );
+};
+
+const ForumSettings = ({ createNewTab }) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!name.trim() || !description.trim()) {
+      setError('Name and description are required');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await createNewForum({
+        name,
+        description
+      });
+
+      setIsSuccess(true);
+      
+      // Open the new forum view
+      createNewTab(
+        "left",
+        name,
+        "forum",
+        response._id
+      );
+    }
+    catch (error) {
+      setError(error.message || 'Failed to create forum. Please try again.');
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <div className='forum-settings success'>
+        <h2>Forum Created Successfully!</h2>
+        <p>Your new forum "{name}" has been created.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className='forum-settings'>
+      <h1>Create new forum</h1>
+      {error && <div className="error-message">{error}</div>}
+      <input 
+        type='text' 
+        value={name} 
+        placeholder='Forum Name' 
+        onChange={(e) => setName(e.target.value)}
+        disabled={isLoading}
+      />
+      <input 
+        type='text' 
+        value={description} 
+        placeholder='Description' 
+        onChange={(e) => setDescription(e.target.value)}
+        disabled={isLoading}
+      />
+      <button 
+        onClick={handleSave}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Creating...' : 'Create Forum'}
+      </button>
     </div>
   );
 };
@@ -394,6 +695,7 @@ const RootContainer = ({tabs, panes, togglePane, closeTab, createNewTab, selectT
             id={tabs.left[panes.left.currentTabIndex].id}
             pane="left"
             createNewTab={createNewTab}
+            metadata={tabs.left[panes.left.currentTabIndex].metadata}
           />)}
         <Pane 
           title={tabs.central[panes.central.currentTabIndex].title}
@@ -401,6 +703,7 @@ const RootContainer = ({tabs, panes, togglePane, closeTab, createNewTab, selectT
           id={tabs.central[panes.central.currentTabIndex].id}
           pane="central"
           createNewTab={createNewTab}
+          metadata={tabs.central[panes.central.currentTabIndex].metadata}
         />
         {panes["right"].visible && (
           <Pane 
@@ -409,6 +712,7 @@ const RootContainer = ({tabs, panes, togglePane, closeTab, createNewTab, selectT
             id={tabs.right[panes.right.currentTabIndex].id}
             pane="right"
             createNewTab={createNewTab}
+            metadata={tabs.right[panes.right.currentTabIndex].metadata}
           />)}
       </div>
     </div>

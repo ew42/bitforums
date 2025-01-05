@@ -1,5 +1,5 @@
 import { fetchPosts } from '../services/api/fetchPosts';
-import { fetchForums } from '../services/api/fetchForums.js';
+import { fetchForums } from '../services/api/forumService.js';
 import { useState, useEffect } from 'react';
 
 const useTabData = () => {
@@ -7,7 +7,7 @@ const useTabData = () => {
   //tab stuff
   const [tabs, setTabStates] = useState({
     left: [{title: "top forums", visible: true, type: "forum browser"}],
-    central: [{title: "Best Friends Ever", visible: true, type: "viewer"}],
+    central: [{title: "Editor", visible: true, type: "viewer"}],
     right: [{title: "top posts", visible: true, type: "viewer"}]
   });
 
@@ -188,7 +188,7 @@ const useTabData = () => {
 
 
 
-  const createNewTab = (pane, title = "untitled", type = "viewer", id = "") => {
+  const createNewTab = (pane, title = "untitled", type = "viewer", id = "", metadata = {}) => {
 
     const tabIndex = panes[pane].numOfTabs;
     const existingTabIndex = tabs[pane].findIndex(tab => tab.id === id);
@@ -222,7 +222,13 @@ const useTabData = () => {
         ...tab,
         visible: false
         })),
-        {title: title, visible: true, type: type, id: id}
+        {
+          title: title,
+          visible: true,
+          type: type,
+          id: id,
+          metadata: metadata
+        }
       ]
 
     }));

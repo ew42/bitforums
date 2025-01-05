@@ -39,19 +39,52 @@ const sampleForums = [
 const samplePosts = [
   {
     title: 'Initial Discussion',
-    content: 'Starting our conversation about this topic...',
+    content: `# Introduction
+    
+This is our first discussion point about this topic. Let me outline a few key areas:
+
+## Key Points
+- First major consideration
+- Second important aspect
+- Third critical element
+
+## Supporting Evidence
+1. Research shows that...
+2. Studies indicate...
+3. Historical precedent suggests...
+
+> Important quote or reference that supports this position
+
+For more information, see [this reference](https://example.com)`,
     createdAt: new Date('2024-01-01'),
     score: 15,
     tags: ['start']
   },
   {
     title: 'First Response',
-    content: 'Interesting perspective, let me add...',
+    content: `## Analysis of Previous Points
+
+I find the previous argument interesting, particularly regarding the second point. Here's why:
+
+### Supporting Arguments
+* Point A demonstrates...
+* Point B illustrates...
+
+\`\`\`
+Example code or formatted text
+that needs to be preserved
+\`\`\`
+
+#### Counter Considerations
+1. However, we should consider...
+2. Another perspective suggests...
+
+---
+**Note:** This is a critical distinction we need to make.`,
     createdAt: new Date('2024-01-02'),
     score: 8,
     tags: ['response']
   }
-  // ... existing sample posts
 ];
 
 // Generate 40 additional posts with varied content
@@ -59,29 +92,125 @@ const generateMorePosts = (baseDate) => {
   const posts = [];
   const topics = ['analysis', 'question', 'critique', 'support', 'counterpoint', 'example', 'clarification'];
   const contentStarters = [
-    'Building on the previous point...',
-    'I disagree with this because...',
-    'This reminds me of...',
-    'To add another perspective...',
-    'Consider this example...',
-    'What if we looked at it this way...',
-    'This connects with...'
+    `## Building on the Previous Point
+    
+In considering the previous argument, we should examine:
+
+1. The underlying assumptions
+2. The practical implications
+3. The potential consequences
+
+### Key Insights
+`,
+    `## Respectful Disagreement
+    
+While the previous points are well-made, I see some potential issues:
+
+* First concern
+* Second consideration
+* Alternative perspective
+
+> Important counterpoint to consider
+`,
+    `## Related Example
+    
+This reminds me of a similar situation:
+
+### Case Study
+1. Background
+2. Similarities
+3. Lessons Learned
+
+\`\`\`
+Supporting data or evidence
+goes here
+\`\`\`
+`,
+    `## Additional Perspective
+    
+To add another dimension to this discussion:
+
+### Consider These Points
+- First new angle
+- Second consideration
+- Third perspective
+
+---
+**Important:** Key takeaway here
+`,
+    `## Practical Example
+    
+Consider this real-world application:
+
+1. Scenario
+2. Implementation
+3. Results
+
+### Lessons Learned
+`,
+    `## Alternative Approach
+    
+What if we looked at it this way:
+
+### New Framework
+* Point One
+* Point Two
+* Point Three
+
+> Key insight to consider
+`,
+    `## Making Connections
+    
+This connects with several important concepts:
+
+1. First connection
+2. Second relationship
+3. Third parallel
+
+### Implications
+`
   ];
 
   for (let i = 0; i < 40; i++) {
     const date = new Date(baseDate);
-    date.setDate(date.getDate() + Math.floor(i/3)); // 2-3 posts per day
+    date.setDate(date.getDate() + Math.floor(i/3));
     date.setHours(Math.floor(Math.random() * 24));
 
     posts.push({
       title: `${topics[i % topics.length]} ${Math.floor(i/topics.length) + 1}`,
-      content: `${contentStarters[i % contentStarters.length]} Extended discussion point ${i + 1}`,
+      content: `${contentStarters[i % contentStarters.length]} ${generateRandomMarkdownContent(i + 1)}`,
       createdAt: date,
-      score: Math.floor(Math.random() * 20) + 1, // Random score 1-20
+      score: Math.floor(Math.random() * 20) + 1,
       tags: [topics[i % topics.length]]
     });
   }
   return posts;
+};
+
+// Add this helper function
+const generateRandomMarkdownContent = (seed) => {
+  const sections = [
+    `Here are the key points to consider:
+- Point ${seed}.1
+- Point ${seed}.2
+- Point ${seed}.3
+
+### Supporting Evidence
+1. Evidence A
+2. Evidence B
+3. Evidence C`,
+    
+    `This leads us to consider:
+\`\`\`
+Technical detail ${seed}
+Another detail
+Final detail
+\`\`\`
+
+**Important conclusion:** ${seed} key takeaways.`
+  ];
+
+  return sections[seed % sections.length];
 };
 
 async function seedDatabase() {

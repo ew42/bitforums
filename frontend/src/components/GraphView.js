@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './GraphView.css';
-import { fetchConversationPosts } from '../services/api/fetchConversationPosts';
+import { fetchConversationPosts } from '../services/api/conversationServices';
 
-const GraphView = ({ conversationId, onPostClick }) => {
+const GraphView = ({ conversationId, onPostClick, onCreatePost }) => {
   const [posts, setPosts] = useState([]);
   const [currentTransform, setCurrentTransform] = useState(null);
+  const [selectedPosts, setSelectedPosts] = useState([]);
   const svgRef = useRef();
   const containerRef = useRef();
 
@@ -106,23 +107,57 @@ const GraphView = ({ conversationId, onPostClick }) => {
       .attr("stroke-width", 2)
       .attr("opacity", 0.5);
 
-    // Create circles with full opacity
-    const nodes = container.selectAll("circle")
+    // Create node groups instead of just circles
+    const nodeGroups = container.selectAll("g.node")
       .data(posts)
       .enter()
-      .append("circle")
+      .append("g")
+      .attr("class", "node")
+      .attr("cursor", "pointer");
+
+    // Add the main circle to each group
+    const circles = nodeGroups.append("circle")
       .attr("r", d => radiusScale(d.score))
       .attr("fill", "#5fadf5")
-      .attr("opacity", 1)  // Full opacity
-      .attr("cursor", "pointer")
+      .attr("opacity", 1)
+      .attr("stroke", d => selectedPosts.includes(d._id) ? "#db5656" : null)
+      .attr("stroke-width", d => selectedPosts.includes(d._id) ? 2 : 0);
+
+    // Add plus icon to each group
+    const plusIconGroups = nodeGroups.append("g")
+      .attr("class", "plus-icon-group")
+      .style("opacity", 0)
+      .attr("transform", d => {
+        const radius = radiusScale(d.score);
+        // Position the plus icon at a distance that scales with the node size
+        const offset = radius + 10; // Base offset from node edge
+        return `translate(${offset}, 0)`;
+      });
+
+    plusIconGroups.append("circle")
+      .attr("class", "plus-icon-circle")
+      .attr("r", d => Math.max(8, radiusScale(d.score) * 0.4)); // Scale plus icon with node, but with a minimum size
+
+    plusIconGroups.append("text")
+      .attr("class", "plus-icon-symbol")
+      .attr("text-anchor", "middle")
+      .attr("dy", "0.3em")
+      .style("font-size", d => `${Math.max(12, radiusScale(d.score) * 0.6)}px`) // Scale text size with node
+      .text("+");
+
+    // Handle interactions
+    nodeGroups
       .on("click", (event, d) => {
         event.stopPropagation();
         onPostClick(d);
       })
       .on("mouseover", function(event, d) {
-        d3.select(this)
+        d3.select(this).select("circle")
           .attr("stroke", "#db5656")
           .attr("stroke-width", 2);
+        
+        d3.select(this).select(".plus-icon-group")
+          .style("opacity", 1);
         
         svg.selectAll("path")
           .attr("opacity", path => {
@@ -132,20 +167,31 @@ const GraphView = ({ conversationId, onPostClick }) => {
             return (path.source._id === d._id || path.target._id === d._id) ? "#db5656" : "#999";
           });
       })
-      .on("mouseout", function() {
-        d3.select(this)
-          .attr("stroke", null);
+      .on("mouseout", function(event, d) {
+        d3.select(this).select("circle")
+          .attr("stroke", selectedPosts.includes(d._id) ? "#db5656" : null)
+          .attr("stroke-width", selectedPosts.includes(d._id) ? 2 : 0);
+        
+        d3.select(this).select(".plus-icon-group")
+          .style("opacity", 0);
         
         svg.selectAll("path")
           .attr("opacity", 0.5)
           .attr("stroke", "#999");
       });
 
-    // Add tooltips
-    nodes.append("title")
-      .text(d => `${d.title}\nScore: ${d.score}`);
+    // Add plus icon click handler
+    plusIconGroups.on("click", (event, d) => {
+      event.stopPropagation();
+      setSelectedPosts(prev => {
+        if (prev.includes(d._id)) {
+          return prev.filter(id => id !== d._id);
+        }
+        return [...prev, d._id];
+      });
+    });
 
-    // Update positions on each tick with curved paths
+    // Update the simulation tick function
     simulation.on("tick", () => {
       links.attr("d", d => {
         const dx = d.target.x - d.source.x,
@@ -154,16 +200,25 @@ const GraphView = ({ conversationId, onPostClick }) => {
         return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
       });
 
-      nodes
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y);
+      nodeGroups
+        .attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
-  }, [posts, onPostClick, currentTransform]);
+  }, [posts, selectedPosts, onPostClick]);
+
+  const handleCreatePost = () => {
+    onCreatePost(selectedPosts, conversationId);
+  };
 
   return (
     <div className="graph-container">
       <svg ref={svgRef} width="100%" height="100%" />
+      <button 
+        className="create-post-button"
+        onClick={selectedPosts.length > 0 ? handleCreatePost : () => onCreatePost([], conversationId)}
+      >
+        {selectedPosts.length > 0 ? 'Create Connected Post' : 'Create New Post'}
+      </button>
     </div>
   );
 };

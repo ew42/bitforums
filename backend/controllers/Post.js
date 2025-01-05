@@ -7,7 +7,12 @@ const postSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true
+    required: true,
+    contentType: {
+      type: String,
+      enum: ['markdown', 'text'],
+      default: 'markdown'
+    }
   },
   conversation: {
     type: mongoose.Schema.Types.ObjectId,

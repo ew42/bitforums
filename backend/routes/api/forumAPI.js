@@ -65,8 +65,8 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const forum = new Forum(req.body);
-    const savedPost = await post.save();
-    res.json(savedPost);
+    const savedForum = await forum.save();
+    res.json(savedForum);
   }
   catch (error) {
     console.log('Error saving forum:', error);
