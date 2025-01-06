@@ -16,7 +16,7 @@ const app = express();
 
 app.use(logger);
 app.use(cors({
-  origin: ['http://localhost:80', 'http://localhost:3000', 'https://bitforums.org'],
+	origin: ['http://localhost:80', 'http://localhost:3000', 'https://bitforums.org', 'https://www.bitforums.org'],
   credentials: true
 }));
 app.use(express.json());
