@@ -22,10 +22,11 @@ import Heading from '@tiptap/extension-heading';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import Blockquote from '@tiptap/extension-blockquote';
+import config from '../config';
 
 import TurndownService from 'turndown';
 
-const API_BASE_URL = 'http://localhost:80/api';
+// const API_BASE_URL = 'https://localhost:80/api';
 
 const ConversationSettings = ({ forumData, createNewTab }) => {
   const [title, setTitle] = useState('');
@@ -457,7 +458,7 @@ const ForumBrowser = ({ pane, createNewTab}) => {
   useEffect(() => {
     const populateForums = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/forum?filter=${filter}&search=${searchQuery}`);
+        const response = await fetch(`${config.API_URL}/forum?filter=${filter}&search=${searchQuery}`);
         const data = await response.json();
         setForums(data);
         setLoading(false);
