@@ -11,6 +11,7 @@ const auth = require('./middleware/auth.js');
 const forumAPI = require('./routes/api/forumAPI.js');
 const conversationAPI = require('./routes/api/conversationAPI.js');
 const validateTokenAPI = require('./routes/api/validateTokenAPI.js');
+const userAPI = require('./routes/api/userAPI.js');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/post', postAPI);
 app.use('/api/forum', forumAPI);
 app.use('/api/conversation', conversationAPI);
 app.use('/api/validate', validateTokenAPI);
+app.use('/api/user', userAPI);
 
 // Then static files and catch-all route
 app.use('/api/*', (req, res) => {

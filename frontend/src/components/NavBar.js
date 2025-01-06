@@ -1,7 +1,7 @@
 import React from 'react';
 import './NavBar.css';
 
-const NavBar = ({ tabs, createNewTab, selectTab, isLoggedIn, username }) => {
+const NavBar = ({ tabs, createNewTab, selectTab, isLoggedIn, userData }) => {
   const registerButton = () => {
     const existingRegisterTab = tabs.central.findIndex(tab => tab.type === "register")
     if (existingRegisterTab !== -1) {
@@ -28,7 +28,7 @@ const NavBar = ({ tabs, createNewTab, selectTab, isLoggedIn, username }) => {
       selectTab("central", existingProfileTab);
     }
     else {
-      createNewTab("central", "profile", "profile");
+      createNewTab("central", "profile", "profile", userData?.userId, { userId: userData?.userId, username: userData?.username });
     }
   };
 
@@ -38,7 +38,7 @@ const NavBar = ({ tabs, createNewTab, selectTab, isLoggedIn, username }) => {
       <div className="account-buttons">
         {isLoggedIn ? (
           <button className="profile-button" onClick={profileButton}>
-            Profile ({username})
+            Profile ({userData?.username})
           </button>
         ) : (
           <>

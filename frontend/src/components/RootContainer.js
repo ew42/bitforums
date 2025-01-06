@@ -23,10 +23,135 @@ import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import Blockquote from '@tiptap/extension-blockquote';
 import config from '../config';
-
 import TurndownService from 'turndown';
+import { fetchUserPosts } from '../services/api/fetchUserPosts';
 
-// const API_BASE_URL = 'https://localhost:80/api';
+const Profile = ({ userdata, createNewTab }) => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    forum: '',
+    conversation: '',
+    search: ''
+  });
+
+  const handleFetchUserPosts = async () => {
+    if (!userdata?.userId) {
+      console.error('No user ID provided');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await fetchUserPosts(userdata.userId, filters);
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userdata?.userId) {
+      handleFetchUserPosts();
+    }
+  }, [userdata?.userId, filters]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  if (!userdata?.userId) {
+    return <div>No user data available</div>;
+  }
+
+  return (
+    <div className="profile-container">
+      <h1>{userdata?.username}'s Posts</h1>
+      
+      <div className="filter-controls">
+        <input
+          type="text"
+          name="forum"
+          placeholder="Filter by forum..."
+          value={filters.forum}
+          onChange={handleFilterChange}
+          className="filter-input"
+        />
+        <input
+          type="text"
+          name="conversation"
+          placeholder="Filter by conversation..."
+          value={filters.conversation}
+          onChange={handleFilterChange}
+          className="filter-input"
+        />
+        <input
+          type="search"
+          name="search"
+          placeholder="Search posts..."
+          value={filters.search}
+          onChange={handleFilterChange}
+          className="search-input"
+        />
+      </div>
+
+      {loading ? (
+        <div>Loading posts...</div>
+      ) : posts.length > 0 ? (
+        <div className="posts-grid">
+          {posts.map(post => (
+            <PostCard
+              key={post._id}
+              title={post.title}
+              author={post.author.username}
+              createdAt={post.createdAt}
+              postId={post._id}
+              createNewTab={createNewTab}
+            />
+          ))}
+        </div>
+      ) : (
+        <div>No posts found</div>
+      )}
+    </div>
+  );
+};
+
+const PostCard = ({ title, author, createdAt, postId, createNewTab }) => {
+  const handleClick = () => {
+    createNewTab(
+      "central",
+      title,
+      "viewer",
+      postId
+    );
+  };
+
+  // Format the date
+  const formattedDate = new Date(createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+
+  return (
+    <div className="post-card" onClick={handleClick}>
+      <h3>{title}</h3>
+      <div className="post-metadata">
+        <span className="author">By {author}</span>
+        <span className="date">{formattedDate}</span>
+      </div>
+    </div>
+  );
+};
 
 const ConversationSettings = ({ forumData, createNewTab }) => {
   const [title, setTitle] = useState('');
@@ -212,7 +337,10 @@ const Pane = ({ title="test", type="viewer", id, pane, createNewTab, metadata })
         />
       case "forum settings":
         return <ForumSettings createNewTab={createNewTab} />;
+      case "profile":
+        return <Profile userdata={metadata} createNewTab={createNewTab} />
     }
+
   };
 
   return (
