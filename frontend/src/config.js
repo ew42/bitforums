@@ -1,5 +1,7 @@
 const config = {
-  API_URL: process.env.REACT_APP_API_URL
+  API_URL: process.env.NODE_ENV === 'production'
+  ? 'https://bitforums.org/api'
+  : 'http://localhost:3001/api'
 };
 
 export default config;

@@ -8,7 +8,7 @@ require('./controllers/Forum');
 require('./controllers/Conversation');
 require('./controllers/Post');
 
-const port = 80;
+const port = 3001;
 const mongoURI = process.env.MONGODB_URI;
 console.log(mongoURI);
 
