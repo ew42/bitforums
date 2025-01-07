@@ -21,6 +21,17 @@ router.get('/:id/posts', async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   try {
+    const forum = await Forum.findById(req.body.forumId);
+    if (!forum) {
+      return res.status(404).json({ error: 'Forum not found' });
+    }
+
+    if (!forum.canUserPost(req.user._id)) {
+      return res.status(403).json({ 
+        error: 'Only moderators and contributors can create conversations in this forum' 
+      });
+    }
+
     const conversationData = {
       title: req.body.title,
       description: req.body.description || '',

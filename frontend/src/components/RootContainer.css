@@ -10,26 +10,60 @@
 	width: 100%;
 	padding: 20px;
 	flex-direction: row;
-	border: solid;
+	border: solid .5px;
+	border-color: #deddf7;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .pane-control-panel {
 	display: flex;
 	flex-direction: row;
-	border: solid;
+	border: solid .5px;
+	border-color: #deddf7;
 	justify-content: space-between;
+	width: 100%;
 }
 
 .pane-control-panel > * {
 	display: flex;
 	flex-direction: row;
-	border: solid;
+	border: .5px solid;
+	border-color: #deddf7;
+	overflow-x: auto;
+	max-width: 33.33%;
+	white-space: nowrap;
+	scrollbar-width: thin;
+	-ms-overflow-style: none;
+}
+
+.pane-control-panel > *::-webkit-scrollbar {
+	height: 6px;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-track {
+	background: #1e1e1e;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 3px;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-thumb:hover {
+	background: #555;
 }
 
 .tab {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	min-width: fit-content;
+	flex-shrink: 0;
+}
+
+.tab button {
+	white-space: nowrap;
 }
 
 .register {
@@ -40,4 +74,62 @@
 
 .register > * {
 	margin: 10px auto;
+}
+
+.conversation-header {
+	display: flex;
+	flex-direction: row;
+}
+
+.new-conversation-button {
+	border: solid .5px;
+	border-color: #deddf7;
+	height: 20px;
+	margin: auto auto auto 10px;
+}
+
+.forum-card {
+	border: solid .5px;
+	border-color: #FFFFFF;
+	margin: 10px 0px;
+	padding: 5px;
+	cursor: pointer;
+	background-color: #3a3431;
+	border-radius: 5px;
+}
+
+.forum-card:hover {
+	background-color: #000000;
+}
+
+.forum-browser {
+	margin: 0px auto;
+}
+
+.conversation-card {
+	border: solid .5px;
+	border-color: #deddf7;
+	margin: 10px 0px;
+	padding: 5px;
+	cursor: pointer;
+	background-color: #3a3431;
+	border-radius: 5px;
+}
+
+.conversation-card:hover {
+	background-color: #000000;
+}
+
+.left-pane-div,
+.central-pane-div,
+.right-pane-div {
+	width: 33.33%;
+	min-width: 0;
+}
+
+.viewer-title > h2 {
+	margin-bottom: 0px;
+}
+.viewer-title > p {
+	margin-top: 0px;
 }

@@ -1,12 +1,16 @@
 html {
-	background-color: #EEEEEE;
+	background-color: #0f0b03;
+	color: #f9f1e4;
 }
 
 .App {
 	line-height: 1.4;
-	background-color: #EEEEEE;
 }
 
+button {
+	background-color: #2a2929;
+	color: #EEEEEE;
+}
 
 div {
 	/* width: 650px;

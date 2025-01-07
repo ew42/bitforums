@@ -9,3 +9,7 @@ strong {
 em {
 	color: #5fadf5;
 }
+
+button:hover {
+	background-color: #000000;
+}

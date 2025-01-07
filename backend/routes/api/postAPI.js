@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Post = require('../../controllers/Post.js');
 const auth = require('../../middleware/auth.js');
+const Forum = require('../../controllers/Forum.js');
 
 
 router.get('/:id', async (req, res) => {
@@ -28,6 +29,22 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   try {
+    const conversation = await mongoose.model('Conversation').findById(req.body.conversation);
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    const forum = await Forum.findById(conversation.forum);
+    if (!forum) {
+      return res.status(404).json({ error: 'Forum not found' });
+    }
+
+    if (!forum.canUserPost(req.user._id)) {
+      return res.status(403).json({ 
+        error: 'Only moderators and contributors can post in this forum' 
+      });
+    }
+
     const postData = {
       title: req.body.title,
       content: req.body.content,

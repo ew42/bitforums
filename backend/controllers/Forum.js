@@ -9,6 +9,10 @@ const forumSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  isInviteOnly: {
+    type: Boolean,
+    default: true
+  },
   contributors: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -27,54 +31,58 @@ const forumSchema = new mongoose.Schema({
   }
 });
 
+forumSchema.methods.canUserPost = function(userId) {
+  return (
+    this.moderators.some(id => id.equals(userId)) ||
+    this.contributors.some(id => id.equals(userId))
+  );
+};
+
+forumSchema.methods.canUserInvite = function(userId) {
+  return this.moderators.some(id => id.equals(userId));
+};
+
 forumSchema.methods.addModerator = async function (userId) {
-  const session = mongoose.startSession();
-  session.startTransaction();
   try {
+    // Add user to moderators and contributors
     this.moderators.push(userId);
     this.contributors.push(userId);
-    this.save();
+    await this.save();
 
-    mongoose.model('User').findByIdAndUpdate(
+    // Update user's moderating and participating arrays
+    await mongoose.model('User').findByIdAndUpdate(
       userId,
-      { $addToSet: { 
-        moderating: this._id,
-        participating: this._id
-      }},
-      { session }
+      { 
+        $addToSet: { 
+          moderating: this._id,
+          participating: this._id
+        }
+      }
     );
-    session.commitTransaction();
   }
   catch (error) {
-    session.abortTransaction();
     throw error;
-  }
-  finally {
-    session.endSession();
   }
 };
 
 forumSchema.methods.addContributor = async function (userId) {
-  const session = mongoose.startSession();
-  session.startTransaction();
   try {
+    // Add user to contributors
     this.contributors.push(userId);
-    this.save();
+    await this.save();
 
-    mongoose.model('User').findByIdAndUpdate(
+    // Update user's participating array
+    await mongoose.model('User').findByIdAndUpdate(
       userId,
-      { $addToSet: { 
-        participating: this._id
-      }},
-      { session }
+      { 
+        $addToSet: { 
+          participating: this._id
+        }
+      }
     );
   }
   catch (error) {
-    session.abortTransaction();
     throw error;
-  }
-  finally {
-    session.endSession();
   }
 };
 

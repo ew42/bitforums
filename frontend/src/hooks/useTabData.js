@@ -6,7 +6,7 @@ const useTabData = () => {
 
   //tab stuff
   const [tabs, setTabStates] = useState({
-    left: [{title: "top forums", visible: true, type: "forum browser"}],
+    left: [{title: "Forum Browser", visible: true, type: "forum browser"}],
     central: [{title: "Editor", visible: true, type: "viewer"}],
     right: [{title: "top posts", visible: true, type: "viewer"}]
   });

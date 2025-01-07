@@ -9,3 +9,7 @@ nav {
 	margin: 0 auto;
 	border-bottom-style: solid;
 }
+
+.account-buttons {
+	margin: auto 10px;
+}

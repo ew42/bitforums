@@ -45,6 +45,7 @@ const Profile = ({ userdata, createNewTab }) => {
     try {
       setLoading(true);
       const data = await fetchUserPosts(userdata.userId, filters);
+      console.log(data);
       setPosts(data);
     } catch (error) {
       console.error('Error fetching user posts:', error);
@@ -114,6 +115,7 @@ const Profile = ({ userdata, createNewTab }) => {
               author={post.author.username}
               createdAt={post.createdAt}
               postId={post._id}
+              postConversation={post.conversation?.title || 'No conversation'}
               createNewTab={createNewTab}
             />
           ))}
@@ -125,7 +127,7 @@ const Profile = ({ userdata, createNewTab }) => {
   );
 };
 
-const PostCard = ({ title, author, createdAt, postId, createNewTab }) => {
+const PostCard = ({ title, author, createdAt, postId, postConversation, createNewTab }) => {
   const handleClick = () => {
     createNewTab(
       "central",
@@ -144,82 +146,63 @@ const PostCard = ({ title, author, createdAt, postId, createNewTab }) => {
 
   return (
     <div className="post-card" onClick={handleClick}>
-      <h3>{title}</h3>
+      <h3><strong>{title}</strong></h3>
       <div className="post-metadata">
-        <span className="author">By {author}</span>
-        <span className="date">{formattedDate}</span>
+        <span className="author">By {author} </span>
+        <span className="date">{formattedDate} </span>
       </div>
     </div>
   );
 };
 
-const ConversationSettings = ({ forumData, createNewTab }) => {
+const ConversationSettings = ({ forum, createNewTab }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
-    // Input validation
-    if (!title.trim() || !description.trim()) {
-      setError('Title and description are required');
-      return;
-    }
-
     setIsLoading(true);
     setError('');
-
     try {
-      const response = await createNewConversation({
+      const conversation = await createNewConversation({
         title,
         description,
-        forumId: forumData._id
+        forumId: forum._id
       });
-
-      setIsSuccess(true);
-      
-      // Open the graph view for the new conversation
       createNewTab(
-        "right",
-        title,
-        "graph view",
-        response._id,
-        { conversationId: response._id }
+        "central",
+        conversation.title,
+        "conversation",
+        conversation._id
       );
-    }
-    catch (error) {
-      setError(error.message || 'Failed to create conversation. Please try again.');
-    }
-    finally {
+    } catch (error) {
+      // Handle specific error messages from the backend
+      if (error.message.includes('Only moderators and contributors')) {
+        setError('You need to be a moderator or contributor to create conversations in this forum');
+      } else {
+        setError(error.message || 'Failed to create conversation');
+      }
+    } finally {
       setIsLoading(false);
     }
   };
 
-  if (isSuccess) {
-    return (
-      <div className='conversation-settings success'>
-        <h2>Conversation Created Successfully!</h2>
-        <p>Your new conversation "{title}" has been created.</p>
-      </div>
-    );
-  }
-
   return (
     <div className='conversation-settings'>
-      <h1>Create new conversation in {forumData.name}</h1>
+      <h2>Create New Conversation</h2>
       {error && <div className="error-message">{error}</div>}
       <input 
-        type='text' 
-        value={title} 
-        placeholder='Title' 
+        type='text'
+        value={title}
+        placeholder='Conversation Title'
         onChange={(e) => setTitle(e.target.value)}
         disabled={isLoading}
       />
       <input 
-        type='text' 
-        value={description} 
-        placeholder='Description' 
+        type='text'
+        value={description}
+        placeholder='Description'
         onChange={(e) => setDescription(e.target.value)}
         disabled={isLoading}
       />
@@ -267,7 +250,7 @@ const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, create
         {tabStates.left?.map((tab, arrayIndex) => <Tab key={
           `left-tab-${arrayIndex}`} pane="left" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
         )}
-        <button className="left-add" onClick={() => {createNewTab("left")}}>+</button>
+        <button className="left-add" onClick={() => {createNewTab("left", "Forum Browser", "forum browser")}}>+</button>
         <button className="left-toggle" onClick={() => {togglePanes("left")}}>Left Pane</button>
       </div>
       <div className="central-pane-div">
@@ -332,7 +315,7 @@ const Pane = ({ title="test", type="viewer", id, pane, createNewTab, metadata })
         />;
       case "conversation settings":
         return <ConversationSettings 
-        forumData={metadata}
+        forum={metadata}
         createNewTab={createNewTab}
         />
       case "forum settings":
@@ -398,8 +381,10 @@ const Viewer = ({ title="test", postId}) => {
         <p>Error: {error}</p>
       ) : postData ? (
         <div>
-          <h2>{postData.title}</h2>
-          <h3>{postData.author.username}</h3>
+          <div className="viewer-title">
+            <h2><strong>{postData.title}</strong></h2>
+            <p>by {postData.author.username}</p>
+          </div>
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
@@ -481,8 +466,10 @@ const Forum = ({ title="Forum", forumId, createNewTab}) => {
     <div className="forum-data">
       <h1>{forumData.name}</h1>
       <p>{forumData.description}</p>
-      <h2>Conversations:</h2>
-      <button onClick={handleNewConversation}>+</button>
+      <div className="conversation-header">
+        <h2>Conversations:</h2>
+        <button className="new-conversation-button" onClick={handleNewConversation}>+</button>
+      </div>
       <div className="conversation-list">
         {forumData.conversations.map(conversation => (
           <ConversationCard
@@ -660,6 +647,7 @@ const ConversationCard = ({pane, title, description, conversationId, createNewTa
 
 const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = false }) => {
   const [title, setTitle] = useState('');
+  const [err, setErr] = useState(null);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -695,6 +683,7 @@ const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = f
         console.log("Post saved successfully");
       } catch (error) {
         console.error("Failed to save post:", error);
+        setErr(error);
       }
     }
   };
@@ -712,6 +701,13 @@ const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = f
     );
   }
 
+  else if (err) {
+    return (
+      <div className="markdown-editor-error">
+        <p>Error: {err.message}</p>
+      </div>
+    );
+  }
   return (
     <div className="markdown-editor">
 

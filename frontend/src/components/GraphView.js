@@ -118,7 +118,7 @@ const GraphView = ({ conversationId, onPostClick, onCreatePost }) => {
     // Add the main circle to each group
     const circles = nodeGroups.append("circle")
       .attr("r", d => radiusScale(d.score))
-      .attr("fill", "#5fadf5")
+      .attr("fill", "#bfb6a9")
       .attr("opacity", 1)
       .attr("stroke", d => selectedPosts.includes(d._id) ? "#db5656" : null)
       .attr("stroke-width", d => selectedPosts.includes(d._id) ? 2 : 0);
