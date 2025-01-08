@@ -25,6 +25,7 @@ import Blockquote from '@tiptap/extension-blockquote';
 import config from '../config';
 import TurndownService from 'turndown';
 import { fetchUserPosts } from '../services/api/fetchUserPosts';
+import { toggleUpvote } from '../services/api/postService';
 
 const Profile = ({ userdata, createNewTab }) => {
   const [posts, setPosts] = useState([]);
@@ -141,15 +142,17 @@ const PostCard = ({ title, author, createdAt, postId, postConversation, createNe
   const formattedDate = new Date(createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 
   return (
     <div className="post-card" onClick={handleClick}>
       <h3><strong>{title}</strong></h3>
       <div className="post-metadata">
-        <span className="author">By {author} </span>
-        <span className="date">{formattedDate} </span>
+        <span className="author">By {author} | </span>
+        <span className="date">on {formattedDate} </span>
       </div>
     </div>
   );
@@ -234,36 +237,49 @@ const ForumCard = ({pane, name, description, forumId, createNewTab}) => {
   );
 };
 
-const Tab = ({ pane, tab, tabIndex, closeTab, selectTab}) => {
+const Tab = ({ pane, tab, tabIndex, closeTab, selectTab, paneStates }) => {
+  const isSelected = paneStates[pane].currentTabIndex === tabIndex;
+  
   return (
-  <div className="tab">
+    <div className={`tab${isSelected ? '-selected' : ''}`}>
       <button className="tab-button" onClick={() => selectTab(pane, tabIndex)}>{tab.title}</button>
-      <button className="x-button" onClick={() => closeTab(pane, tabIndex)}>X</button>
-  </div>
-)};
+      {!(pane === "left" && tabIndex === 0) && (
+        <button className="x-button" onClick={() => closeTab(pane, tabIndex)}>X</button>
+      )}
+    </div>
+  );
+};
 
 const PaneControlPanel = ({ tabStates, paneStates, togglePanes, closeTab, createNewTab, selectTab }) => {
 
   return (
     <div className="pane-control-panel">
       <div className="left-pane-div">
-        {tabStates.left?.map((tab, arrayIndex) => <Tab key={
-          `left-tab-${arrayIndex}`} pane="left" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
-        )}
-        <button className="left-add" onClick={() => {createNewTab("left", "Forum Browser", "forum browser")}}>+</button>
+        {tabStates.left?.map((tab, arrayIndex) => (
+          <Tab 
+            key={`left-tab-${arrayIndex}`}
+            pane="left" 
+            tab={tab} 
+            tabIndex={arrayIndex} 
+            closeTab={closeTab} 
+            selectTab={selectTab}
+            paneStates={paneStates}
+          />
+        ))}
+        {/* <button className="left-add" onClick={() => {createNewTab("left", "Forum Browser", "forum browser")}}>+</button> */}
         <button className="left-toggle" onClick={() => {togglePanes("left")}}>Left Pane</button>
       </div>
       <div className="central-pane-div">
         {tabStates.central?.map((tab, arrayIndex) => <Tab key={
-          `central-tab-${arrayIndex}`} pane="central" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
+          `central-tab-${arrayIndex}`} pane="central" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab} paneStates={paneStates}/>
         )}
-        <button className="central-add" onClick={() => {createNewTab("central")}}>+</button>
+        {/* <button className="central-add" onClick={() => {createNewTab("central")}}>+</button> */}
       </div>
         <div className="right-pane-div">
           {tabStates.right?.map((tab, arrayIndex) => <Tab key={
-          `right-tab-${arrayIndex}`} pane="right" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab}/>
+          `right-tab-${arrayIndex}`} pane="right" tab={tab} tabIndex={arrayIndex} closeTab={closeTab} selectTab={selectTab} paneStates={paneStates}/>
         )}
-          <button className="right-add" onClick={() => {createNewTab("right")}}>+</button>
+          {/* <button className="right-add" onClick={() => {createNewTab("right")}}>+</button> */}
           <button className="right-toggle" onClick={() => {togglePanes("right")}}>Right Pane</button>
       </div>
     </div>
@@ -273,8 +289,7 @@ const Pane = ({ title="test", type="viewer", id, pane, createNewTab, metadata })
   const renderContent = () => {
     switch (type) {
       case "viewer":
-        console.log("Generating viewer component");
-        return <Viewer title={title} postId={id}/>;
+        return <Viewer title={title} postId={id} createNewTab={createNewTab}/>;
       case "forum":
         return <Forum title={title} forumId={id} createNewTab={createNewTab}/>;
       case "register":
@@ -333,10 +348,39 @@ const Pane = ({ title="test", type="viewer", id, pane, createNewTab, metadata })
   );
 };
 
-const Viewer = ({ title="test", postId}) => {
+const Viewer = ({ title="test", postId, createNewTab}) => {
   const [postData, setPostData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
+
+  const handleProfileClick = () => {
+    console.log('postdata:', postData)
+    createNewTab(
+      "central",
+      postData.author.username,
+      "profile",
+      postData.author._id,
+      {userId: postData.author._id, username: postData.author.username}
+    )
+  };
+
+  const handleUpvote = async () => {
+    try {
+      const result = await toggleUpvote(postId);
+      setPostData(prev => ({
+        ...prev,
+        score: result.score
+      }));
+      setHasUpvoted(result.hasUpvoted);
+    } catch (error) {
+      if (error.message === 'Must be logged in to upvote') {
+        createNewTab("central", "Login", "login");
+      } else {
+        setError(error.message);
+      }
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -383,7 +427,15 @@ const Viewer = ({ title="test", postId}) => {
         <div>
           <div className="viewer-title">
             <h2><strong>{postData.title}</strong></h2>
-            <p>by {postData.author.username}</p>
+            <p className="author-tag" onClick={handleProfileClick}>
+              by <em>{postData.author.username}</em> | on {new Date(postData.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </p>
           </div>
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]}
@@ -392,6 +444,12 @@ const Viewer = ({ title="test", postId}) => {
           >
             {postData.content}
           </ReactMarkdown>
+          <button 
+            className={`upvote-button ${hasUpvoted ? 'upvoted' : ''}`}
+            onClick={handleUpvote}
+          >
+            ▲ {postData?.score || 0}
+          </button>
         </div>
       ) : (
         <p>No post data available</p>
@@ -712,11 +770,13 @@ const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = f
     <div className="markdown-editor">
 
       <div className="editor-toolbar">
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>H1</button>
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>H2</button>
-        <button onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
-        <button onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>
-        <button onClick={() => editor.chain().focus().toggleBlockquote().run()}>Quote</button>
+        <div className="non-save-buttons">
+          <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>H1</button>
+          <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>H2</button>
+          <button onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
+          <button onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>
+          <button onClick={() => editor.chain().focus().toggleBlockquote().run()}>Quote</button>
+        </div>
         <button onClick={handleSave}>Save</button>
       </div>
       <input

@@ -79,4 +79,22 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+router.post('/:id/upvote', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const updatedPost = await post.toggleUpvote(req.user._id);
+    res.json({
+      score: updatedPost.score,
+      hasUpvoted: updatedPost.upvotedBy.includes(req.user._id)
+    });
+  } catch (error) {
+    console.error('Error updating upvote:', error);
+    res.status(500).json({ error: 'Error updating upvote' });
+  }
+});
+
 module.exports = router;

@@ -35,6 +35,10 @@ const postSchema = new mongoose.Schema({
     default: 0
   },
   tags: [String],
+  upvotedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
 });
 
 postSchema.statics.createPost = async function(postData) {
@@ -101,6 +105,22 @@ postSchema.methods.removePost = async function() {
   finally {
     session.endSession();
   }
+};
+
+postSchema.methods.toggleUpvote = async function(userId) {
+  const hasUpvoted = this.upvotedBy.includes(userId);
+  
+  if (hasUpvoted) {
+    // Remove upvote
+    this.upvotedBy = this.upvotedBy.filter(id => !id.equals(userId));
+    this.score -= 1;
+  } else {
+    // Add upvote
+    this.upvotedBy.push(userId);
+    this.score += 1;
+  }
+  
+  return this.save();
 };
 
 const Post = mongoose.model('Post', postSchema);

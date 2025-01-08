@@ -10,6 +10,7 @@ html {
 button {
 	background-color: #2a2929;
 	color: #EEEEEE;
+	cursor: pointer;
 }
 
 div {

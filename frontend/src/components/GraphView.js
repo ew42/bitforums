@@ -212,13 +212,26 @@ const GraphView = ({ conversationId, onPostClick, onCreatePost }) => {
 
   return (
     <div className="graph-container">
-      <svg ref={svgRef} width="100%" height="100%" />
-      <button 
-        className="create-post-button"
-        onClick={selectedPosts.length > 0 ? handleCreatePost : () => onCreatePost([], conversationId)}
-      >
-        {selectedPosts.length > 0 ? 'Create Connected Post' : 'Create New Post'}
-      </button>
+      {(!posts || posts.length === 0) ? (
+        <div className="empty-graph">
+          <button 
+            className="create-first-post-button"
+            onClick={() => onCreatePost([], conversationId)}
+          >
+            Create First Post
+          </button>
+        </div>
+      ) : (
+        <>
+          <svg ref={svgRef} width="100%" height="100%" />
+          <button 
+            className="create-post-button"
+            onClick={selectedPosts.length > 0 ? handleCreatePost : () => onCreatePost([], conversationId)}
+          >
+            {selectedPosts.length > 0 ? 'Create Connected Post' : 'Create New Post'}
+          </button>
+        </>
+      )}
     </div>
   );
 };

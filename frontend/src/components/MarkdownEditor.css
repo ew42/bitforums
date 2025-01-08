@@ -106,3 +106,13 @@
 .markdown-editor-error {
   color: #ff0000;
 }
+
+.editor-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.non-save-buttons > button {
+  margin: 0px .25rem;
+}

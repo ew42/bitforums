@@ -6,10 +6,10 @@
 }
 
 .pane {
-	display: flex;
+	/* display: flex; */
 	width: 100%;
 	padding: 20px;
-	flex-direction: row;
+	/* flex-direction: row; */
 	border: solid .5px;
 	border-color: #deddf7;
 	overflow-y: auto;
@@ -19,22 +19,26 @@
 .pane-control-panel {
 	display: flex;
 	flex-direction: row;
-	border: solid .5px;
+	border: solid 1px; 
 	border-color: #deddf7;
 	justify-content: space-between;
 	width: 100%;
+	min-height: 32px;
 }
 
 .pane-control-panel > * {
 	display: flex;
 	flex-direction: row;
-	border: .5px solid;
+	border: 1px solid;
 	border-color: #deddf7;
 	overflow-x: auto;
+	overflow-y: hidden;
 	max-width: 33.33%;
 	white-space: nowrap;
 	scrollbar-width: thin;
 	-ms-overflow-style: none;
+	align-items: stretch;
+	height: auto;
 }
 
 .pane-control-panel > *::-webkit-scrollbar {
@@ -53,8 +57,18 @@
 .pane-control-panel > *::-webkit-scrollbar-thumb:hover {
 	background: #555;
 }
-
 .tab {
+	/* display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	min-width: fit-content;
+	flex-shrink: 0;
+	align-items: center;
+	height: 100%;
+	cursor: pointer;
+	border: solid .5px;
+	border-color: #deddf7;
+	transition: background-color 0.2s; */
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -62,7 +76,19 @@
 	flex-shrink: 0;
 }
 
+.tab-selected > .tab-button {
+	background-color: #182c6b;
+	color: #EEEEEE;
+	height: 100%;
+	white-space: nowrap;
+}
+
+.tab:hover:not(.selected) {
+	background-color: rgba(136, 166, 141, 0.2);
+}
+
 .tab button {
+	height: 100%;
 	white-space: nowrap;
 }
 
@@ -98,6 +124,11 @@
 	border-radius: 5px;
 }
 
+.forum-card > * {
+	margin: 5px auto;
+	justify-content: center;
+}
+
 .forum-card:hover {
 	background-color: #000000;
 }
@@ -109,11 +140,16 @@
 .conversation-card {
 	border: solid .5px;
 	border-color: #deddf7;
-	margin: 10px 0px;
+	margin: 10px auto;
 	padding: 5px;
 	cursor: pointer;
 	background-color: #3a3431;
 	border-radius: 5px;
+
+}
+
+.conversation-card > * {
+	margin: 5px auto;
 }
 
 .conversation-card:hover {
@@ -132,4 +168,12 @@
 }
 .viewer-title > p {
 	margin-top: 0px;
+}
+
+.forum-data {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }

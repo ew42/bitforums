@@ -45,3 +45,35 @@ svg {
   font-weight: bold;
   pointer-events: none;
 }
+
+.empty-graph {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.create-first-post-button {
+  padding: 30px 60px;
+  font-size: 24px;
+  background-color: #88a68d;
+  color: #f9f1e4;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.create-first-post-button:hover {
+  background-color: #4a8cc4;
+  transform: scale(1.05);
+  border-radius: 15px;
+}
+
+.empty-graph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
