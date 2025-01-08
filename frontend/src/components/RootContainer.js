@@ -706,6 +706,7 @@ const ConversationCard = ({pane, title, description, conversationId, createNewTa
 const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = false }) => {
   const [title, setTitle] = useState('');
   const [err, setErr] = useState(null);
+  const [saved, setSaved] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -739,6 +740,7 @@ const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = f
         console.log("Saving post with data:", postData);
         await savePost(postData);
         console.log("Post saved successfully");
+        setSaved(true);
       } catch (error) {
         console.error("Failed to save post:", error);
         setErr(error);
@@ -763,6 +765,13 @@ const MarkdownEditor = ({ initialValue = '', onSave, metadata = {}, readOnly = f
     return (
       <div className="markdown-editor-error">
         <p>Error: {err.message}</p>
+      </div>
+    );
+  }
+  else if (saved) {
+    return (
+      <div className="markdown-editor-saved">
+        <p>Saved!</p>
       </div>
     );
   }

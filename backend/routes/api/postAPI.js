@@ -39,11 +39,11 @@ router.post('/', auth, async (req, res) => {
       return res.status(404).json({ error: 'Forum not found' });
     }
 
-    if (!forum.canUserPost(req.user._id)) {
-      return res.status(403).json({ 
-        error: 'Only moderators and contributors can post in this forum' 
-      });
-    }
+    // if (!forum.canUserPost(req.user._id)) {
+    //   return res.status(403).json({ 
+    //     error: 'Only moderators and contributors can post in this forum' 
+    //   });
+    // }
 
     const postData = {
       title: req.body.title,

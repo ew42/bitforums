@@ -123,6 +123,25 @@ const GraphView = ({ conversationId, onPostClick, onCreatePost }) => {
       .attr("stroke", d => selectedPosts.includes(d._id) ? "#db5656" : null)
       .attr("stroke-width", d => selectedPosts.includes(d._id) ? 2 : 0);
 
+    // Add text label below each circle
+    nodeGroups.append("text")
+      .attr("class", "node-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", d => radiusScale(d.score) + 15) // Position text below the circle
+      .style("font-size", "12px")
+      .style("fill", "#f9f1e4")
+      .text(d => d.title)
+      .each(function(d) {
+        // Truncate long titles
+        const text = d3.select(this);
+        const maxLength = 20;
+        let title = d.title;
+        if (title.length > maxLength) {
+          title = title.substring(0, maxLength) + '...';
+        }
+        text.text(title);
+      });
+
     // Add plus icon to each group
     const plusIconGroups = nodeGroups.append("g")
       .attr("class", "plus-icon-group")
