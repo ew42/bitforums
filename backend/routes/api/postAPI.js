@@ -11,10 +11,8 @@ router.get('/:id', async (req, res) => {
             const postId = req.params.id;
             console.log("Finding post with id:", postId);
             const post = await Post.findById(postId)
-                .populate({
-                    path: 'author',
-                    select: 'username'
-                });
+                .populate('author', 'username')
+                .populate('upvotedBy', '_id');
             if (!post) {
                 console.log('Post not found');
                 return res.status(404).json({ error: 'Post not found' });

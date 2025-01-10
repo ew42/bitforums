@@ -396,6 +396,13 @@ const Viewer = ({ title="test", postId, createNewTab}) => {
         const data = await fetchPosts(postId);
         if (isMounted) {
           setPostData(data);
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            const userId = JSON.parse(atob(token.split('.')[1])).userId;
+            setHasUpvoted(data.upvotedBy?.some(voter => voter._id === userId));
+          } else {
+            setHasUpvoted(false);
+          }
           setError(null);
         }
       }
