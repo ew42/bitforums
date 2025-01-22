@@ -19,7 +19,11 @@ Thus, the highest quality contributions are more visible, literally.
 ## Development
 
 Frontend: React.js
+
 Backend: Node.js/Express.js
+
 Database: MongoDB
+
 Graph Visualization: D3.js
+
 Content Display: Markdown through the tiptap editor
