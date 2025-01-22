@@ -1,50 +1,25 @@
-# Rightly
+# BitForums
 
-## Founding Principles
+## Function
+BitForums is an online discussion platform meant to foster long-form and high-quality discourse.
+It's organized into a hierarchy:
 
-The internet enables instantaneous and geography-blind communication
-    - Anyone regardless of location, can engage in conversations with anyone else
+Forum -> Conversation -> Post 
 
-Leading economists, academics, and politicians all engage in public speaking events,
-demonstrating an interest in talking to the general public.
-However, these leading thinkers aren't engaged in long-form written public discourse.
-    - Why not?
+Forums are made up of conversations which are made of posts.
 
-Bad signal to noise ratio.
-    - So much shit to sift through.
-Lack of incentives.
-These platforms are not designed to optimize for these kinds of discussions.
-    - Many of these platforms aren't good at preserving posts past the immediately following time.
-        - Try finding a specific twitter post that you didn't bookmark
-        - Why would they spend time putting effort in, if they will have nothing to show for it
-            - I remember reading in "Deep Work" that there was one professor who didn't write emails, 
-            because he could spend it writing his book -- which do you want, a thousand sent/received emails or a book?
+Individual conversations are navigated through the graph view.
+Each node represents a post and the connections represent the replies to it.
 
-## How I've thought about structuring rightly
+This way, as conversations become more dense, individual topics can be easily distinguished and resolved without cluttering individual posts.
 
-Bad signal to noise:
-    Organize posts into conversations.
-    Forums are invite-only discussion forums that anyone can create.
-    The point is for these to be high-quality written discussions are made up of individual posts.
-    Posts can be standalone or replies to others. I'm thinking that a graph structure might be useful here.
-    Incorporate some sort of upvote/downvote system. Posts with higher scores should have larger nodes in the graph model.
-    (Not super high conviction on upvote/downvote system, but need to think about it more)
-    Non-members can post, but they should be separated and not advertised. 
-    I want non-members who make high-quality contributions to be considered for invitation.
-    There should probably be some gradient of exclusivity on discussions, but I don't know if I need to develop anything for that.
+Additionally, the size of a post corresponds to the number of upvotes received.
+Thus, the highest quality contributions are more visible, literally.
 
-Lack of incentives:
-    Advertisements are probably going to be main source of income
-    Some rev share will probably be determined by views/engagement(although, this could create perverse incentives)
-    I think this is something that will only be determined by time. People who talk in public care about status.
-    They want to be right. This gives them an opportunity to do so.
+## Development
 
-These platforms are not designed to be optimized for these kinds of discussions:
-    The algorithms on most social medias are designed to give the content that will increase watch time/engagement
-    Fundamentally, this goes against what this forum is meant to do.
-    Through these conversations we want to seek truth, to find truth through argumenetation.
-    That's what we are optimizing for.
-    If someone said something incredibly profound on Twitter, you may never find it again.
-    But when something gets enough upvotes/downvotes, it's gravity on the graph structure shouldn't diminsh with time
-    I want to incorporate some amount of Gwern's idea of long-content
-
+Frontend: React.js
+Backend: Node.js/Express.js
+Database: MongoDB
+Graph Visualization: D3.js
+Content Display: Markdown through the tiptap editor
