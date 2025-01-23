@@ -8,7 +8,7 @@ const useTabData = () => {
   const [tabs, setTabStates] = useState({
     left: [{title: "Forum Browser", visible: false, type: "forum browser"}, {title: "Welcome to Bitforums", visible: true, type: "forum", id:"677b35b26bf10ef201ed7170"}],
     central: [{title: "Editor", visible: true, type: "viewer"}],
-    right: [{title: "top posts", visible: true, type: "graph view", id: "67819bf3cc0854c19f831f6d"}]
+    right: [{title: "Example Conversation", visible: true, type: "graph view", id: "67819bf3cc0854c19f831f6d"}]
   });
 
   //pane stuff
