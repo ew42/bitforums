@@ -1,5 +1,7 @@
 # BitForums
 
+bitforums is currently hosted at [bitforums.org](https://bitforums.org)
+
 ## Function
 BitForums is an online discussion platform meant to foster long-form and high-quality discourse.
 It's organized into a hierarchy:
