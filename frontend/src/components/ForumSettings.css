@@ -1,0 +1,51 @@
+.forum-settings {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.forum-settings h1 {
+  margin-bottom: 10px;
+}
+
+.forum-settings input {
+  padding: 10px;
+  border: 1px solid #deddf7;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #eee;
+}
+
+.forum-settings button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #182c6b;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.forum-settings button:hover:not(:disabled) {
+  background-color: #253e8e;
+}
+
+.forum-settings button:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #db5656;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: rgba(219, 86, 86, 0.1);
+}
+
+.forum-settings.success {
+  text-align: center;
+}

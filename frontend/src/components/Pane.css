@@ -1,0 +1,8 @@
+.pane {
+  width: 100%;
+  padding: 20px;
+  border: solid .5px;
+  border-color: #deddf7;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

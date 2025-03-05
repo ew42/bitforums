@@ -1,0 +1,57 @@
+.pane-control-panel {
+  display: flex;
+  flex-direction: row;
+  border: solid 1px; 
+  border-color: #deddf7;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 32px;
+}
+
+.pane-control-panel > * {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid;
+  border-color: #deddf7;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 33.33%;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+  align-items: stretch;
+  height: auto;
+}
+
+.pane-control-panel > *::-webkit-scrollbar {
+  height: 6px;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.pane-control-panel > *::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.left-pane-div,
+.central-pane-div,
+.right-pane-div {
+  width: 33.33%;
+  min-width: 0;
+}
+
+.left-toggle, .right-toggle {
+  padding: 6px 10px;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  border-left: 1px solid #deddf7;
+  cursor: pointer;
+}

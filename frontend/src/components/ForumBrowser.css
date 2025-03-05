@@ -1,0 +1,50 @@
+.forum-browser {
+  margin: 0 auto;
+  max-width: 800px;
+  width: 100%;
+}
+
+.forum-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.forum-controls input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  border: 1px solid #deddf7;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #eee;
+}
+
+.forum-controls select {
+  padding: 10px;
+  border: 1px solid #deddf7;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #eee;
+}
+
+.forum-controls button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #182c6b;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.forum-controls button:hover {
+  background-color: #253e8e;
+}
+
+.forum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

@@ -1,0 +1,45 @@
+.viewer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.viewer-title > h2 {
+  margin-bottom: 0;
+}
+
+.viewer-title > p {
+  margin-top: 0;
+}
+
+.author-tag {
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.2s;
+}
+
+.author-tag:hover {
+  color: #fff;
+}
+
+.markdown-content {
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.upvote-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upvote-button.upvoted {
+  background-color: #db5656;
+  color: #f9f1e4;
+}
+
+.upvote-button:hover {
+  transform: translateY(-2px);
+}

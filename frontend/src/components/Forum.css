@@ -1,0 +1,38 @@
+.forum-data {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.conversation-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0 10px;
+}
+
+.conversation-header h2 {
+  margin: 0;
+}
+
+.new-conversation-button {
+  border: solid .5px;
+  border-color: #deddf7;
+  height: 20px;
+  margin: auto auto auto 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  border-radius: 50%;
+}
+
+.conversation-list {
+  width: 100%;
+  max-width: 800px;
+}
