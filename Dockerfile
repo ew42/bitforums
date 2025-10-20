@@ -16,8 +16,11 @@ RUN npm ci --omit=dev --no-audit --no-fund
 FROM node:20-bullseye
 WORKDIR /app
 
+# Copy backend source
+COPY backend /app/backend
+
 # Copy backend app and installed node_modules
-COPY --from=backend-deps /app/backend /app/backend
+COPY --from=backend-deps /app/backend/node_modules /app/backend/node_modules
 
 # Copy compiled frontend into backend expected path
 COPY --from=frontend-builder /app/frontend/build /app/frontend/build
