@@ -1,0 +1,27 @@
+.post-card {
+  border: solid 0.5px;
+  border-color: #deddf7;
+  border-radius: 5px;
+  padding: 15px;
+  cursor: pointer;
+  background-color: #3a3431;
+  transition: background-color 0.2s ease;
+}
+
+.post-card:hover {
+  background-color: #000000;
+}
+
+.post-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.post-metadata {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.author, .date {
+  display: inline-block;
+}

@@ -1,0 +1,17 @@
+.conversation-card {
+  border: solid .5px;
+  border-color: #deddf7;
+  margin: 10px auto;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #3a3431;
+  border-radius: 5px;
+}
+
+.conversation-card > * {
+  margin: 5px auto;
+}
+
+.conversation-card:hover {
+  background-color: #000000;
+}
