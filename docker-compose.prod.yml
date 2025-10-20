@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rightly/app:prod
+    container_name: rightly-app
+    network_mode: host
+    env_file:
+      - ./backend/.env
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # certs
+      - ./backend/log:/app/backend/log # logging file
+    restart: unless-stopped
